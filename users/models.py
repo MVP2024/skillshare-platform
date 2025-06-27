@@ -10,9 +10,9 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, verbose_name="Email")
     phone = models.CharField(max_length=35, blank=True, null=True, verbose_name="Телефон")
     city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Город")
-    avatar = models.EmailField(upload_to="users/avatars/", blank=True, null=True, verbose_name="Аватар")
+    avatar = models.ImageField(upload_to="users/avatars_users/", blank=True, null=True, verbose_name="Аватар")
 
-    USERNAME_FIELD = "email" # устанавливаем email как поля для авторизациии
+    USERNAME_FIELD = "email" # устанавливаем email как поля для авторизации
     REQUIRED_FIELDS = []
 
     class Meta:
@@ -20,4 +20,4 @@ class User(AbstractUser):
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return sel.email
+        return self.email
