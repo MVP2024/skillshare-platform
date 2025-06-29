@@ -12,8 +12,8 @@ class Course(models.Model):
                                 help_text="Укажите картинку превью урока")
     description = models.TextField(blank=True, null=True, verbose_name="Описание курса",
                                    help_text="Укажите описание курса")
-    course_user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец курса",
-                                    help_text="Укажите владельца курса")  # удаляется урок вместе с владельцем
+    # course_user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец курса",
+    #                                 help_text="Укажите владельца курса")  # удаляется урок вместе с владельцем
 
     # course_user = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name="Владелец курса",
     #                                 related_name="courses", null=True) ## расскоментируй, чтобы урок оставался, когда владелец удалялся.

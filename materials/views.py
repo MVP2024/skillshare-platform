@@ -25,6 +25,5 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic-класс для получения, обновления и удаления конкретного урока.
     """
-    permission_classes = [IsOwnerOrReadOnly]
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
