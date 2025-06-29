@@ -21,14 +21,6 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = LessonSerializer
 
 
-class IsOwnerOrReadOnly(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
-            return True
-        # Эта строка верна для Lesson, так как владелец через Course
-        return obj.course.course_user is not None and obj.course.course_user == request.user
-
-
 class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic-класс для получения, обновления и удаления конкретного урока.
