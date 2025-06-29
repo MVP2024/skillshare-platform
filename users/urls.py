@@ -8,8 +8,6 @@ app_name = "users"
 router = DefaultRouter()
 router.register(r"users", UserViewSet, basename="user")
 
-urlpatterns = router.urls
-
 urlpatterns = [
     path("profile/", ProfileUpdateView.as_view(), name="profile-update"),
 ] + router.urls
