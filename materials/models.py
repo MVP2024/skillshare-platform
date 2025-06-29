@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import URLValidator
+from users.models import User
 
 
 class Course(models.Model):
@@ -11,6 +12,11 @@ class Course(models.Model):
                                 help_text="Укажите картинку превью урока")
     description = models.TextField(blank=True, null=True, verbose_name="Описание курса",
                                    help_text="Укажите описание курса")
+    course_user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец курса",
+                                    help_text="Укажите владельца курса")  # удаляется урок вместе с владельцем
+
+    # course_user = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name="Владелец курса",
+    #                                 related_name="courses", null=True) ## расскоментируй, чтобы урок оставался, когда владелец удалялся.
 
     class Meta:
         verbose_name = "Курс"
@@ -37,7 +43,6 @@ class Lesson(models.Model):
                                 help_text="Загрузите картинку превью урока")
     video_link = models.URLField(blank=True, null=True, verbose_name="Ссылка на видео",
                                  help_text="Укажите ссылку на видео")
-
 
     class Meta:
         verbose_name = "Урок"
