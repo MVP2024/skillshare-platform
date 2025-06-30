@@ -3,6 +3,20 @@ from users.models import User
 from users.models import Payment
 
 
+class PaymentSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели Payment, включающий информацию о пользователе, курсе и уроке.
+    Используется для вывода истории платежей в профиле пользователя.
+    """
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    paid_course = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True)
+    paid_lesson = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True)
+
+    class Meta:
+        model = Payment
+        fields = "__all__"
+
+
 class UserSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели User, включающий историю платежей.
@@ -24,17 +38,3 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "payments",
         )
-
-
-class PaymentSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для модели Payment, включающий информацию о пользователе, курсе и уроке.
-    Используется для вывода истории платежей в профиле пользователя.
-    """
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-    paid_course = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True)
-    paid_lesson = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True)
-
-    class Meta:
-        model = Payment
-        fields = "__all__"

@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from users.views import UserViewSet, ProfileUpdateView
+from users.views import UserViewSet, ProfileUpdateView, PaymentViewSet
 from django.urls import path
 
 
