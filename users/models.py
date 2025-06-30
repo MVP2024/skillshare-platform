@@ -53,6 +53,8 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"  # устанавливаем email как поля для авторизации
     REQUIRED_FIELDS = []
 
+    objects = CustomUserManager()
+
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
@@ -76,7 +78,7 @@ class Payment(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="payments",  # Добавляем related_name для удобства доступа из User
+        related_name="payments",  # Добавил related_name для удобства доступа из User
         verbose_name="Пользователь",
         help_text="Пользователь, совершивший платеж",
     )
