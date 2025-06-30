@@ -4,6 +4,10 @@ from users.models import User
 from users.serializers import UserSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from users.models import Payment
+from users.serializers import PaymentSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -20,3 +24,22 @@ class ProfileUpdateView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для управления платежами с поддержкой фильтрации и сортировки.
+    Позволяет:
+    - Сортировать по дате оплаты (`payment_date`).
+    - Фильтровать по курсу (`paid_course`) и уроку (`paid_lesson`).
+    - Фильтровать по способу оплаты (`payment_method`).
+    """
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = {
+        "paid_course": ["exact"],
+        "paid_lesson": ["exact"],
+        "payment_method": ["exact"],
+    }
+    ordering_fields = ["payment_date"]
