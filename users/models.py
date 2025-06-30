@@ -1,7 +1,40 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.exceptions import ValidationError
 from materials.models import Course, Lesson
+
+
+class CustomUserManager(BaseUserManager):
+    """
+    Пользовательский менеджер модели User, который использует email в качестве уникального идентификатора
+    для аутентификации вместо username.
+    """
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Создает и сохраняет обычного пользователя с заданным email и паролем.
+        """
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Создает и сохраняет суперпользователя с заданным email и паролем.
+        Суперпользователь автоматически получает права is_staff=True, is_superuser=True и is_active=True.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -28,7 +61,7 @@ class User(AbstractUser):
         return self.email
 
 
-class Paymant(models.Model):
+class Payment(models.Model):
     """
     Модель платежа.
     Хрнит информацию о транзакциях пользователей за курсы или уроки.
@@ -75,7 +108,7 @@ class Paymant(models.Model):
         help_text="Сумма платежа",
     )
     payment_method = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=PAYMENT_METHOD_CHOICES,
         verbose_name="Способ оплаты",
         help_text="Способ оплаты (наличные или перевод)",
