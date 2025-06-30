@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import URLValidator
-from users.models import User
+from django.conf import settings
 
 
 class Course(models.Model):
@@ -15,8 +15,9 @@ class Course(models.Model):
     # course_user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец курса",
     #                                 help_text="Укажите владельца курса")  # удаляется урок вместе с владельцем
 
-    course_user = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name="Владелец курса",
-                                    related_name="courses", null=True) # расскоментируй, чтобы урок оставался, когда владелец удалялся.
+    course_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name="Владелец курса",
+                                    related_name="courses",
+                                    null=True)  # расскоментируй, чтобы урок оставался, когда владелец удалялся.
 
     class Meta:
         verbose_name = "Курс"
