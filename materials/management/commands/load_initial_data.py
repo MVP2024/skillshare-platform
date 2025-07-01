@@ -35,7 +35,9 @@ class Command(BaseCommand):
 
         # Формируем полный путь к файлу фикстуры
         fixture_path = Path(settings.BASE_DIR) / "materials" / "fixtures" / fixture_name
-        group_fixture_path = (Path(settings.BASE_DIR) / "users" / "fixtures" / group_fixture_name)
+        group_fixture_path = (
+            Path(settings.BASE_DIR) / "users" / "fixtures" / group_fixture_name
+        )
 
         # Проверяем существование файла фикстуры перед загрузкой
         if fixture_path.exists():
