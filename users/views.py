@@ -4,7 +4,7 @@ from users.models import User
 from users.serializers import UserSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets, filters
+from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from users.models import Payment
 from users.serializers import PaymentSerializer
@@ -26,9 +26,9 @@ class ProfileUpdateView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class PaymentViewSet(viewsets.ModelViewSet):
+class PaymentListAPIView(generics.ListAPIView):
     """
-    ViewSet для управления платежами с поддержкой фильтрации и сортировки.
+    APIView для управления платежами с поддержкой фильтрации и сортировки.
     Позволяет:
     - Сортировать по дате оплаты (`payment_date`).
     - Фильтровать по курсу (`paid_course`) и уроку (`paid_lesson`).
