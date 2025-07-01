@@ -3,7 +3,7 @@ from django.core.management import call_command
 from pathlib import Path
 from django.conf import settings
 from materials.models import Course, Lesson
-from users.models import User
+from users.models import User, Payment
 
 
 class Command(BaseCommand):
