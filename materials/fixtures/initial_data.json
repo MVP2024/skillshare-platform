@@ -3,15 +3,15 @@
     "model": "users.user",
     "pk": 1,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$kuly5VPJaDszJcrSGupu6J$FFKRleK3LG1pfCoBox09jQlbGnXDaY/fVNjibowYQW8=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "A",
-        "last_name": "A",
+        "first_name": "Андрей",
+        "last_name": "Болтырёв",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-29T20:10:36.478Z",
-        "email": "a@a.com",
+        "date_joined": "2025-06-29T20:10:36Z",
+        "email": "user2@a.com",
         "phone": "+79999999999",
         "city": "Одинцово",
         "avatar": "users/avatars_users/guest.gif",
@@ -23,17 +23,17 @@
     "model": "users.user",
     "pk": 2,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$oEU2QhADlXHI7qVpB6m6z5$i/tHAfJ7mc+1KC7gauLwq0qW1f2r3e64QfG52l21gUE=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "",
-        "last_name": "",
+        "first_name": "Елена",
+        "last_name": "Красивая",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-30T10:55:44.439Z",
-        "email": "b@b.com",
+        "date_joined": "2025-06-30T10:55:44Z",
+        "email": "user4@a.com",
         "phone": "+79999999999",
-        "city": "Меркурий",
+        "city": "Брянск",
         "avatar": "users/avatars_users/2025-06-30_13-49-04.png",
         "groups": [],
         "user_permissions": []
@@ -43,15 +43,15 @@
     "model": "users.user",
     "pk": 3,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$UcB2mvwp79j8SI3sjjhqSz$5GDTfrNFOBy5w+DySbSBdbz9ShzOt/1fG9/H4CwG2/Q=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "Бубка",
-        "last_name": "Подсолнечника",
+        "first_name": "Наталья",
+        "last_name": "Алексеева",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-30T10:57:58.405Z",
-        "email": "c@c.com",
+        "date_joined": "2025-06-30T10:57:58Z",
+        "email": "user8@a.com",
         "phone": "+79999999999",
         "city": "Меркурий",
         "avatar": "users/avatars_users/2025-06-30_13-49-04_itK6UEQ.png",
@@ -63,19 +63,21 @@
     "model": "users.user",
     "pk": 4,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$f0dh856JOUm3wHTfhEgpqk$kY9V+SHQQnhjM5UdleyhAXD0OzgArtbSDctzjIqSECw=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "Яблоко",
-        "last_name": "Красное",
+        "first_name": "Александр",
+        "last_name": "Медведев",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-30T10:59:09.411Z",
-        "email": "d@d.com",
+        "date_joined": "2025-06-30T10:59:09Z",
+        "email": "user7@a.com",
         "phone": "+79999999901",
-        "city": "Венера",
+        "city": "Ейск",
         "avatar": "users/avatars_users/2025-06-30_13-49-04_985WUhg.png",
-        "groups": [],
+        "groups": [
+            1
+        ],
         "user_permissions": []
     }
 },
@@ -83,17 +85,17 @@
     "model": "users.user",
     "pk": 5,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$tnCaPjx2jVr0wA1qjVPZLD$ey/xqqlIqBl1jyTS7Gwzz4yWw7sBfAcyBzhUoVpXtz4=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "Банан",
-        "last_name": "Жёлтый",
+        "first_name": "Ирина",
+        "last_name": "Полено",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-30T11:00:08.070Z",
-        "email": "e@e.com",
+        "date_joined": "2025-06-30T11:00:08Z",
+        "email": "user6@a.com",
         "phone": "+79999999902",
-        "city": "Земля",
+        "city": "Тверь",
         "avatar": "users/avatars_users/Земля.png",
         "groups": [],
         "user_permissions": []
@@ -103,17 +105,17 @@
     "model": "users.user",
     "pk": 6,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$E0AhdqUEk3J3ed0gjfsIkE$MpYeVjYe/NdnqwpZ52rjcsooR/uRil+WyQNU8abOcgc=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "Перец",
-        "last_name": "Жгучий",
+        "first_name": "Ольга",
+        "last_name": "Широкая",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-30T11:01:18.778Z",
-        "email": "f@f.com",
+        "date_joined": "2025-06-30T11:01:18Z",
+        "email": "user5@a.com",
         "phone": "+79999999903",
-        "city": "Марс",
+        "city": "Самара",
         "avatar": "users/avatars_users/2025-06-30_14-00-57.png",
         "groups": [],
         "user_permissions": []
@@ -123,17 +125,17 @@
     "model": "users.user",
     "pk": 7,
     "fields": {
-        "password": "",
+        "password": "pbkdf2_sha256$1000000$nXnp7IAxCqtOv1ryx6RtUe$L5Di9gTQDIbELBq2ZnMjELCdGZOozchx+6NA1AIoUWI=",
         "last_login": null,
         "is_superuser": false,
-        "first_name": "Личи",
-        "last_name": "Сочный",
+        "first_name": "Виктор",
+        "last_name": "Цыбуля",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-06-30T11:02:20.467Z",
-        "email": "g@g.com",
+        "date_joined": "2025-06-30T11:02:20Z",
+        "email": "user3@a.com",
         "phone": "+79999999904",
-        "city": "Юпитер",
+        "city": "Москва",
         "avatar": "users/avatars_users/2025-06-30_14-01-56.png",
         "groups": [],
         "user_permissions": []
@@ -144,14 +146,54 @@
     "pk": 8,
     "fields": {
         "password": "pbkdf2_sha256$1000000$iPDEZ48wDlfP18pAbWvEIF$gOvYA9IjMLd/FgQaVijXv0/viDIhZmHu5WKBiDJOwu0=",
-        "last_login": "2025-06-30T11:20:57.749Z",
+        "last_login": "2025-07-01T15:08:38.712Z",
         "is_superuser": true,
-        "first_name": "",
-        "last_name": "",
+        "first_name": "Хозяин",
+        "last_name": "Леса",
         "is_staff": true,
         "is_active": true,
-        "date_joined": "2025-06-30T11:19:59.306Z",
+        "date_joined": "2025-06-30T11:19:59Z",
         "email": "walery.medvedev@gmail.com",
+        "phone": "+70000000000",
+        "city": "Одинцово",
+        "avatar": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 9,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$y9hCBNrMgXcaTVUpsdLf0B$0QFMPNbsAk0QYVQH1VWCZy244XdxrxZMK6uuWO3roNI=",
+        "last_login": "2025-07-01T15:09:35.182Z",
+        "is_superuser": false,
+        "first_name": "Максим",
+        "last_name": "Перепелица",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-07-01T14:54:49Z",
+        "email": "user1@a.com",
+        "phone": "+79999999995",
+        "city": "Москва",
+        "avatar": "users/avatars_users/2025-06-14_17-25-33.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 10,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$aDHAdpG7xAgy2XZFZIs48f$Xy86PjvjK4KoizBgFXmCfe7C1a+MjnIPhPnEOxKNv6c=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Анастасия",
+        "last_name": "Великая",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-07-01T15:20:40.605Z",
+        "email": "",
         "phone": null,
         "city": null,
         "avatar": "",
@@ -255,7 +297,8 @@
         "title": "Портфолио это просто",
         "description": "Создадим с нуля своё портфолио.",
         "preview": "lessons/previews/2025-06-30_14-55-08.png",
-        "video_link": "https://my.sky.pro/student-cabinet/stream-lesson/146997/homework-requirements"
+        "video_link": "https://my.sky.pro/student-cabinet/stream-lesson/146997/homework-requirements",
+        "lesson_user": null
     }
 },
 {
@@ -266,7 +309,8 @@
         "title": "Урок 1. Вводная часть.",
         "description": "Определим темпераменты людей.",
         "preview": "lessons/previews/2025-06-30_14-52-58.png",
-        "video_link": "https://yandex.ru/video/preview/7260739622712456111"
+        "video_link": "https://yandex.ru/video/preview/7260739622712456111",
+        "lesson_user": null
     }
 },
 {
@@ -277,7 +321,8 @@
         "title": "Проект 1. Улучшаем поиск и сортировку товаров по критериям в яндекс-маркет",
         "description": "1. Разберём проект полностью. \r\n2. Выявим всё, что используется и для чего.\r\n3. Выявим лучшие стороны.\r\n4. Выявим недочёты и не правильную логику.\r\n5. Подправим необходимое.\r\n6. Напишем тесты.",
         "preview": "lessons/previews/2025-06-30_14-50-57.png",
-        "video_link": "https://yandex.ru/video/preview/5492102865002256052"
+        "video_link": "https://yandex.ru/video/preview/5492102865002256052",
+        "lesson_user": null
     }
 },
 {
@@ -288,7 +333,8 @@
         "title": "Урок 1. Что такое Python? Его нюансы.",
         "description": "Краткое содержание. Создаём алгоритм. Рисуем себе схему. Делаем программу, что можно было получить с того или иного алгоритма.",
         "preview": "lessons/previews/2025-06-30_14-44-19.png",
-        "video_link": "https://stackoverflow.com/questions/11222440/how-to-create-a-reference-to-a-variable-in-python"
+        "video_link": "https://stackoverflow.com/questions/11222440/how-to-create-a-reference-to-a-variable-in-python",
+        "lesson_user": null
     }
 }
 ]
