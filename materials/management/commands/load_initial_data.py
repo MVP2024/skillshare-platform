@@ -35,9 +35,7 @@ class Command(BaseCommand):
 
         # Формируем полный путь к файлу фикстуры
         fixture_path = Path(settings.BASE_DIR) / "materials" / "fixtures" / fixture_name
-        group_fixture_path = (
-            Path(settings.BASE_DIR) / "users" / "fixtures" / group_fixture_name
-        )
+        group_fixture_path = (Path(settings.BASE_DIR) / "users" / "fixtures" / group_fixture_name)
 
         # Проверяем существование файла фикстуры перед загрузкой
         if fixture_path.exists():
@@ -50,4 +48,14 @@ class Command(BaseCommand):
             # Выводим предупреждение, если файл фикстуры не найден
             self.stdout.write(
                 self.style.WARNING(f"Фикстура '{fixture_name}' не найдена.")
+            )
+
+        # Загрузка фикстуры групп
+        if group_fixture_path.exists():
+            self.stdout.write("Загрузка фикстуры групп...")
+            call_command("loaddata", group_fixture_name)
+            self.stdout.write(self.style.SUCCESS("Фикстура групп загружена."))
+        else:
+            self.stdout.write(
+                self.style.WARNING(f"Фикстура групп '{group_fixture_name}' не найдена.")
             )
