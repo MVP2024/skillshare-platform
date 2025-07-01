@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from users.models import User
 
 
 class IsModerator(BasePermission):
@@ -21,14 +22,20 @@ class IsOwner(BasePermission):
     """
     Пользовательское разрешение, позволяющее редактировать или удалять объект только его владельцам.
     Предполагается, что экземпляр модели имеет атрибут 'course_user', 'lesson_user' или 'user'.
+    Добавлена проверка для самого объекта User.
     """
     def has_object_permission(self, request, view, obj):
-        # Проверяем, является ли пользователь владельцем
+
+        # Для экземпляров модели User, проверяем, является ли объект самим запрашивающим пользователем
+        if isinstance(obj, User):
+            return obj == request.user
+
+        # Для других моделей (Course, Lesson, Payment), проверяем их соответствующие поля владельца
         if hasattr(obj, 'course_user'):
             return obj.course_user == request.user
         elif hasattr(obj, 'lesson_user'):
             return obj.lesson_user == request.user
-        elif hasattr(obj, 'user'):
+        elif hasattr(obj, 'user'): # Для модели Payment
             return obj.user == request.user
         # Если это урок, проверяем владельца его курса (вторичная проверка, если lesson_user не установлен)
         elif hasattr(obj, 'course') and hasattr(obj.course, 'course_user'):

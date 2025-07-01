@@ -42,6 +42,23 @@ class UserSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('email',)
 
+    def to_representation(self, instance):
+        """
+        Условно скрывает конфиденциальные поля, если запрашивающий пользователь не является владельцем профиля.
+        """
+        ret = super().to_representation(instance)
+        request = self.context.get('request')
+
+        # Если запрос существует и пользователь аутентифицирован
+        if request and request.user.is_authenticated:
+            # Если запрашивающий пользователь НЕ является владельцем просматриваемого профиля
+            if request.user != instance:
+                # Удаляем конфиденциальные поля
+                ret.pop('last_name', None)
+                ret.pop('payments', None)
+                # Поле 'password' уже write_only, поэтому оно не будет отображаться при GET-запросах.
+        return ret
+
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         user = User.objects.create(**validated_data)

@@ -9,6 +9,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from users.models import Payment
 from users.serializers import PaymentSerializer
+from users.permissions import IsOwner
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,7 +25,11 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         if self.action == 'create':
             perm_classes = [AllowAny]
-        else:
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            # Разрешить обновление/удаление только владельцу профиля
+            perm_classes = [IsAuthenticated, IsOwner]
+        else: # 'list', 'retrieve'
+            # Авторизованные пользователи могут просматривать список и детали любого профиля
             perm_classes = [IsAuthenticated]
         return [permission() for permission in perm_classes]
 
