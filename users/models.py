@@ -113,7 +113,7 @@ class Payment(models.Model):
         max_length=20,
         choices=PAYMENT_METHOD_CHOICES,
         verbose_name="Способ оплаты",
-        help_text="Способ оплаты (наличные или перевод)",
+        help_text="Способ оплаты",
     )
 
     class Meta:
@@ -131,6 +131,7 @@ class Payment(models.Model):
         """
         Проверяет, что платеж связан либо с курсом, либо с уроком, но не с обоими.
         """
+        super().clean()
         if self.paid_course and self.paid_lesson:
             raise ValidationError("Платеж не может быть одновременно за курс и за урок.")
         if not self.paid_course and not self.paid_lesson:
