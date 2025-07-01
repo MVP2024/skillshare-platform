@@ -17,16 +17,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Удаление данных...")
-        # Удаляем уроки первыми, так как они зависят от курсов
+        # Удаляем платежи первыми, чтобы избежать конфликтов
+        Payment.objects.all().delete()
+        # Удаляем уроки, так как они зависят от курсов
         Lesson.objects.all().delete()
-
         # Затем удаляем курсы
         Course.objects.all().delete()
-
-        # Потом пользователей (каскадно удаляются связанные платежи)
-
-
-        # Суперпользователя не удаляем
+        # Потом пользователей (суперпользователя не удаляем)
         User.objects.filter(is_superuser=False).delete()
 
         self.stdout.write(self.style.SUCCESS("Данные удалены."))
