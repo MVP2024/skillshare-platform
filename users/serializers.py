@@ -25,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     payments = PaymentSerializer(many=True, read_only=True)  # Вложенный сериализатор для платежей
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
@@ -37,4 +38,24 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "payments",
+            "password",
         )
+        read_only = ('email',)
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = User.objects.create(**validated_data)
+        if password is not None:
+            user.set_password(password)
+            user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password is not None:
+            instance.set_password(password)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
