@@ -24,7 +24,11 @@ class Command(BaseCommand):
         Course.objects.all().delete()
 
         # Потом пользователей (каскадно удаляются связанные платежи)
-        User.objects.all().delete()
+
+
+        # Суперпользователя не удаляем
+        User.objects.filter(is_superuser=False).delete()
+
         self.stdout.write(self.style.SUCCESS("Данные удалены."))
 
         fixture_name = "initial_data.json"
