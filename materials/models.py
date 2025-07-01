@@ -44,6 +44,9 @@ class Lesson(models.Model):
                                 help_text="Загрузите картинку превью урока")
     video_link = models.URLField(blank=True, null=True, verbose_name="Ссылка на видео",
                                  help_text="Укажите ссылку на видео")
+    lesson_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name="Владелец урока",
+                                    related_name="lessons",
+                                    null=True, blank=True)
 
     class Meta:
         verbose_name = "Урок"
