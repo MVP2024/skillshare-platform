@@ -1,16 +1,18 @@
-from django.core.management.base import BaseCommand
-from django.core.management import call_command
 from pathlib import Path
+
 from django.conf import settings
+from django.core.management import call_command
+from django.core.management.base import BaseCommand
+
 from materials.models import Course, Lesson
-from users.models import User, Payment
+from users.models import Payment, User
 
 
 class Command(BaseCommand):
     """
-        Команда Django для загрузки начальных тестовых данных в базу данных.
-        Перед загрузкой данных, она удаляет существующие записи для предотвращения дублирования.
-        Данные загружаются из фикстуры 'initial_data.json', расположенной в 'materials/fixtures/'.
+    Команда Django для загрузки начальных тестовых данных в базу данных.
+    Перед загрузкой данных, она удаляет существующие записи для предотвращения дублирования.
+    Данные загружаются из фикстуры 'initial_data.json', расположенной в 'materials/fixtures/'.
     """
 
     help = "Загружает тестовые данные из фикстуры (курсы, уроки, пользователи, платежи)"
@@ -32,8 +34,10 @@ class Command(BaseCommand):
         group_fixture_name = "groups.json"
 
         # Формируем полный путь к файлу фикстуры
-        fixture_path = Path(settings.BASE_DIR) / 'materials' / 'fixtures' / fixture_name
-        group_fixture_path = Path(settings.BASE_DIR) / 'users' / 'fixtures' / group_fixture_name
+        fixture_path = Path(settings.BASE_DIR) / "materials" / "fixtures" / fixture_name
+        group_fixture_path = (
+            Path(settings.BASE_DIR) / "users" / "fixtures" / group_fixture_name
+        )
 
         # Проверяем существование файла фикстуры перед загрузкой
         if fixture_path.exists():
@@ -44,4 +48,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Данные загружены."))
         else:
             # Выводим предупреждение, если файл фикстуры не найден
-            self.stdout.write(self.style.WARNING(f"Фикстура '{fixture_name}' не найдена."))
+            self.stdout.write(
+                self.style.WARNING(f"Фикстура '{fixture_name}' не найдена.")
+            )

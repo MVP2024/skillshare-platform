@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from materials.models import Course, Lesson
 
 
@@ -13,6 +14,7 @@ class CourseLessonSerializer(serializers.ModelSerializer):
     """
     Облегченный сериализатор для уроков, используемый при вложении в CourseSerializer.
     """
+
     class Meta:
         model = Lesson
         fields = ["id", "title"]

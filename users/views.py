@@ -1,21 +1,18 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-
-from users.models import User
-from users.serializers import UserSerializer
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from users.models import Payment
-from users.serializers import PaymentSerializer
+from rest_framework import filters, generics, viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from users.models import Payment, User
 from users.permissions import IsOwner
+from users.serializers import PaymentSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
     """
     ViewSet для CRUD операций с пользователями (включая редактирование профиля).
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -23,18 +20,23 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Создаёт экземпляр и возвращает список разрешений, необходимых для этого представления
         """
-        if self.action == 'create':
+        if self.action == "create":
             perm_classes = [AllowAny]
-        elif self.action in ['update', 'partial_update', 'destroy']:
+        elif self.action in ["update", "partial_update", "destroy"]:
             # Разрешить обновление/удаление только владельцу профиля
             perm_classes = [IsAuthenticated, IsOwner]
-        else: # 'list', 'retrieve'
+        else:  # 'list', 'retrieve'
             # Авторизованные пользователи могут просматривать список и детали любого профиля
             perm_classes = [IsAuthenticated]
         return [permission() for permission in perm_classes]
 
 
 class ProfileUpdateView(generics.RetrieveUpdateAPIView):
+    """
+    APIView для получения и обновления профиля текущего авторизованного пользователя.
+    Пользователь может просматривать и редактировать только свой собственный профиль.
+    """
+
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
@@ -50,6 +52,7 @@ class PaymentListAPIView(generics.ListAPIView):
     - Фильтровать по курсу (`paid_course`) и уроку (`paid_lesson`).
     - Фильтровать по способу оплаты (`payment_method`).
     """
+
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]

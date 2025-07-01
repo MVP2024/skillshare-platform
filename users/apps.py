@@ -8,7 +8,9 @@ class UsersConfig(AppConfig):
     def ready(self):
         # Импортируем здесь, чтобы избежать циклического импорта
         from django.contrib import admin
+
         from users.models import User
+
         from .admin import CustomUserAdmin
 
         try:
