@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+
 from users.models import User
 from users.serializers import UserSerializer
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from users.models import Payment
@@ -16,6 +17,16 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_permissions(self):
+        """
+        Создаёт экземпляр и возвращает список разрешений, необходимых для этого представления
+        """
+        if self.action == 'create':
+            perm_classes = [AllowAny]
+        else:
+            perm_classes = [IsAuthenticated]
+        return [permission() for permission in perm_classes]
 
 
 class ProfileUpdateView(generics.RetrieveUpdateAPIView):
@@ -43,3 +54,4 @@ class PaymentListAPIView(generics.ListAPIView):
         "payment_method": ["exact"],
     }
     ordering_fields = ["payment_date"]
+    permission_classes = [IsAuthenticated]

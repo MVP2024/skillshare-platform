@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
             "payments",
             "password",
         )
-        read_only = ('email',)
+        read_only_fields = ('email',)
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
