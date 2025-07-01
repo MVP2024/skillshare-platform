@@ -14,6 +14,21 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
+    def get_permissions(self):
+        if self.action == 'create':
+            # Создавать курсы могут только не-модераторы
+            self.permission_classes = [IsAuthenticated, IsNotModerator]
+        elif self.action in ['update', 'partial_update']:
+            # Обновлять курсы могут владельцы или модераторы
+            self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
+        elif self.action == 'destroy':
+            # Удалять курсы могут только владельцы, которые не являются модераторами
+            self.permission_classes = [IsAuthenticated, IsOwner, IsNotModerator]
+        else:  # list, retrieve (просмотр)
+            # Просматривать курсы могут все аутентифицированные пользователи
+            self.permission_classes = [IsAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
     def perform_create(self, serializer):
         serializer.save(course_user=self.request.user)
 
@@ -25,6 +40,15 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
 
+    def get_permissions(self):
+        if self.request.method == 'POST':  # Create action
+            # Создавать уроки могут только не-модераторы
+            self.permission_classes = [IsAuthenticated, IsNotModerator]
+        else:  # GET (list)
+            # Просматривать уроки могут все аутентифицированные пользователи
+            self.permission_classes = [IsAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
 
 class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -32,3 +56,16 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH']:  # Update action
+            # Обновлять уроки могут владельцы или модераторы
+            self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
+        elif self.request.method == 'DELETE':  # Destroy action
+            # Удалять уроки могут только владельцы, которые не являются модераторами
+            self.permission_classes = [IsAuthenticated, IsOwner, IsNotModerator]
+        else:  # GET (retrieve)
+            # Просматривать уроки могут все аутентифицированные пользователи
+            self.permission_classes = [IsAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
