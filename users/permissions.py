@@ -20,15 +20,17 @@ class IsNotModerator(BasePermission):
 class IsOwner(BasePermission):
     """
     Пользовательское разрешение, позволяющее редактировать или удалять объект только его владельцам.
-    Предполагается, что экземпляр модели имеет атрибут 'course_user' или 'user'.
+    Предполагается, что экземпляр модели имеет атрибут 'course_user', 'lesson_user' или 'user'.
     """
     def has_object_permission(self, request, view, obj):
         # Проверяем, является ли пользователь владельцем
         if hasattr(obj, 'course_user'):
             return obj.course_user == request.user
+        elif hasattr(obj, 'lesson_user'):
+            return obj.lesson_user == request.user
         elif hasattr(obj, 'user'):
             return obj.user == request.user
-        # Если это урок, проверяем владельца его курса
+        # Если это урок, проверяем владельца его курса (вторичная проверка, если lesson_user не установлен)
         elif hasattr(obj, 'course') and hasattr(obj.course, 'course_user'):
             return obj.course.course_user == request.user
         return False
