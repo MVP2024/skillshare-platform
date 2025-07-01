@@ -29,8 +29,11 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Данные удалены."))
 
         fixture_name = "initial_data.json"
+        group_fixture_name = "groups.json"
+
         # Формируем полный путь к файлу фикстуры
         fixture_path = Path(settings.BASE_DIR) / 'materials' / 'fixtures' / fixture_name
+        group_fixture_path = Path(settings.BASE_DIR) / 'users' / 'fixtures' / group_fixture_name
 
         # Проверяем существование файла фикстуры перед загрузкой
         if fixture_path.exists():
