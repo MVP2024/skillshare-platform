@@ -9,9 +9,18 @@ class LessonSerializer(serializers.ModelSerializer):
         # course_user = serializers.PrimaryKeyRelatedField(source='course_user', read_only=True)
 
 
+class CourseLessonSerializer(serializers.ModelSerializer):
+    """
+    Облегченный сериализатор для уроков, используемый при вложении в CourseSerializer.
+    """
+    class Meta:
+        model = Lesson
+        fields = ["id", "title"]
+
+
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
-    lessons = LessonSerializer(many=True, read_only=True)
+    lessons = CourseLessonSerializer(many=True, read_only=True)
 
     class Meta:
         model = Course

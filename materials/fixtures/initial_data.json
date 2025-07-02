@@ -1,0 +1,294 @@
+[
+{
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "A",
+        "last_name": "A",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-29T20:10:36.478Z",
+        "email": "a@a.com",
+        "phone": "+79999999999",
+        "city": "Одинцово",
+        "avatar": "users/avatars_users/guest.gif",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T10:55:44.439Z",
+        "email": "b@b.com",
+        "phone": "+79999999999",
+        "city": "Меркурий",
+        "avatar": "users/avatars_users/2025-06-30_13-49-04.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Бубка",
+        "last_name": "Подсолнечника",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T10:57:58.405Z",
+        "email": "c@c.com",
+        "phone": "+79999999999",
+        "city": "Меркурий",
+        "avatar": "users/avatars_users/2025-06-30_13-49-04_itK6UEQ.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Яблоко",
+        "last_name": "Красное",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T10:59:09.411Z",
+        "email": "d@d.com",
+        "phone": "+79999999901",
+        "city": "Венера",
+        "avatar": "users/avatars_users/2025-06-30_13-49-04_985WUhg.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Банан",
+        "last_name": "Жёлтый",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:00:08.070Z",
+        "email": "e@e.com",
+        "phone": "+79999999902",
+        "city": "Земля",
+        "avatar": "users/avatars_users/Земля.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 6,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Перец",
+        "last_name": "Жгучий",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:01:18.778Z",
+        "email": "f@f.com",
+        "phone": "+79999999903",
+        "city": "Марс",
+        "avatar": "users/avatars_users/2025-06-30_14-00-57.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 7,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Личи",
+        "last_name": "Сочный",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:02:20.467Z",
+        "email": "g@g.com",
+        "phone": "+79999999904",
+        "city": "Юпитер",
+        "avatar": "users/avatars_users/2025-06-30_14-01-56.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 8,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$iPDEZ48wDlfP18pAbWvEIF$gOvYA9IjMLd/FgQaVijXv0/viDIhZmHu5WKBiDJOwu0=",
+        "last_login": "2025-06-30T11:20:57.749Z",
+        "is_superuser": true,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:19:59.306Z",
+        "email": "walery.medvedev@gmail.com",
+        "phone": null,
+        "city": null,
+        "avatar": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 1,
+    "fields": {
+        "user": 1,
+        "payment_date": "2025-06-30T11:56:14.840Z",
+        "paid_course": 2,
+        "paid_lesson": null,
+        "amount": "200.00",
+        "payment_method": "make_qr_code"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 2,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-06-30T11:56:36.416Z",
+        "paid_course": null,
+        "paid_lesson": 3,
+        "amount": "200.00",
+        "payment_method": "transfer"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 3,
+    "fields": {
+        "user": 3,
+        "payment_date": "2025-06-30T11:56:52.754Z",
+        "paid_course": 3,
+        "paid_lesson": null,
+        "amount": "500.00",
+        "payment_method": "make_qr_code"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 4,
+    "fields": {
+        "user": 8,
+        "payment_date": "2025-06-30T11:57:27.897Z",
+        "paid_course": 4,
+        "paid_lesson": null,
+        "amount": "100.00",
+        "payment_method": "cash"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 1,
+    "fields": {
+        "title": "Создаём проекты",
+        "preview": "courses/previews/2025-06-30_14-31-50.png",
+        "description": "Здесь научим создавать проекты  отталкиваясь от использованных фреймворка",
+        "course_user": 6
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 2,
+    "fields": {
+        "title": "Python это просто",
+        "preview": "courses/previews/2025-06-14_17-25-33.png",
+        "description": "Здесь вы найдёте ответы на вопросы с разжёвыванием тем с разными ходовыми проектами, а также придумаете своё.",
+        "course_user": 7
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 3,
+    "fields": {
+        "title": "Нейролингвистическое программирование",
+        "preview": "courses/previews/2025-06-30_14-33-52.png",
+        "description": "Здесь научимся разговаривать, чтобы нас услышали с первого раза.",
+        "course_user": 5
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 4,
+    "fields": {
+        "title": "Составим  сами себе портфолио",
+        "preview": "courses/previews/2025-06-30_14-38-57.png",
+        "description": "Создадим себе портфолию, от которого шансы на трудоустройства возрастут на 120%",
+        "course_user": 4
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 1,
+    "fields": {
+        "course": 4,
+        "title": "Портфолио это просто",
+        "description": "Создадим с нуля своё портфолио.",
+        "preview": "lessons/previews/2025-06-30_14-55-08.png",
+        "video_link": "https://my.sky.pro/student-cabinet/stream-lesson/146997/homework-requirements"
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 2,
+    "fields": {
+        "course": 3,
+        "title": "Урок 1. Вводная часть.",
+        "description": "Определим темпераменты людей.",
+        "preview": "lessons/previews/2025-06-30_14-52-58.png",
+        "video_link": "https://yandex.ru/video/preview/7260739622712456111"
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 3,
+    "fields": {
+        "course": 1,
+        "title": "Проект 1. Улучшаем поиск и сортировку товаров по критериям в яндекс-маркет",
+        "description": "1. Разберём проект полностью. \r\n2. Выявим всё, что используется и для чего.\r\n3. Выявим лучшие стороны.\r\n4. Выявим недочёты и не правильную логику.\r\n5. Подправим необходимое.\r\n6. Напишем тесты.",
+        "preview": "lessons/previews/2025-06-30_14-50-57.png",
+        "video_link": "https://yandex.ru/video/preview/5492102865002256052"
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 4,
+    "fields": {
+        "course": 2,
+        "title": "Урок 1. Что такое Python? Его нюансы.",
+        "description": "Краткое содержание. Создаём алгоритм. Рисуем себе схему. Делаем программу, что можно было получить с того или иного алгоритма.",
+        "preview": "lessons/previews/2025-06-30_14-44-19.png",
+        "video_link": "https://stackoverflow.com/questions/11222440/how-to-create-a-reference-to-a-variable-in-python"
+    }
+}
+]
