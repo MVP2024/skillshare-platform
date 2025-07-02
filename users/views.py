@@ -22,8 +22,8 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             perm_classes = [AllowAny]
         elif self.action in ["update", "partial_update", "destroy"]:
-            # Разрешить обновление/удаление только владельцу профиля
-            perm_classes = [IsAuthenticated, IsOwner]
+            # Разрешить обновление/удаление только владельцу профиля, модератору и администратору
+            perm_classes = [IsAuthenticated, IsOwnerOrModerator]
         else:  # 'list', 'retrieve'
             # Авторизованные пользователи могут просматривать список и детали любого профиля
             perm_classes = [IsAuthenticated]
