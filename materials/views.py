@@ -3,7 +3,7 @@ from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 
 from materials.models import Course, Lesson
 from materials.serializers import CourseSerializer, LessonSerializer
-from users.permissions import IsNotModerator, IsOwner, IsOwnerOrModerator
+from users.permissions import IsNotModerator, IsOwner, IsOwnerOrModerator, IsOwnerOrSuperuser
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -38,8 +38,8 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
         elif self.action == "destroy":
-            # Удалять курсы могут только владельцы и администратор
-            self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
+            # Удалять курсы могут только владельцы и администратор (суперпользователь)
+            self.permission_classes = [IsAuthenticated, IsOwnerOrSuperuser]
 
         else:  # list
             # Просматривать список курсов могут все аутентифицированные пользователи.
@@ -120,13 +120,13 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
             # Просматривать конкретный урок могут владельцы или модераторы
             self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
-        if self.request.method in ["PUT", "PATCH"]:  # Update action
+        elif self.request.method in ["PUT", "PATCH"]:  # Update action
             # Обновлять уроки могут владельцы или модераторы
             self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
         elif self.request.method == "DELETE":  # Destroy action
-            # Удалять уроки могут только владельцы и администратор
-            self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
+            # Удалять уроки могут только владельцы и администратор (суперпользователь)
+            self.permission_classes = [IsAuthenticated, IsOwnerOrSuperuser]
 
         else:  # GET (retrieve)
             # Просматривать уроки могут все аутентифицированные пользователи
