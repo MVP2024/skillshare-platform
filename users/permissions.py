@@ -79,4 +79,3 @@ class IsOwnerOrSuperuser(BasePermission):
             # Проверяем, является ли пользователь владельцем
             return IsOwner().has_object_permission(request, view, obj)
         return False
-
