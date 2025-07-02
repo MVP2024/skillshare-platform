@@ -1,6 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.exceptions import ValidationError
+from django.db import models
+
 from materials.models import Course, Lesson
 
 
@@ -9,12 +10,13 @@ class CustomUserManager(BaseUserManager):
     Пользовательский менеджер модели User, который использует email в качестве уникального идентификатора
     для аутентификации вместо username.
     """
+
     def create_user(self, email, password=None, **extra_fields):
         """
         Создает и сохраняет обычного пользователя с заданным email и паролем.
         """
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -26,14 +28,14 @@ class CustomUserManager(BaseUserManager):
         Создает и сохраняет суперпользователя с заданным email и паролем.
         Суперпользователь автоматически получает права is_staff=True, is_superuser=True и is_active=True.
         """
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
         return self.create_user(email, password, **extra_fields)
 
 
@@ -41,14 +43,33 @@ class User(AbstractUser):
     """
     Стандартная модель пользователя, использующая email для авторизации
     """
+
     username = None
 
-    email = models.EmailField(unique=True, verbose_name="Email", help_text="Укажите свой email")
-    phone = models.CharField(max_length=35, blank=True, null=True, verbose_name="Телефон",
-                             help_text="Укажите свой телефон")
-    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Город", help_text="Укажите свой город")
-    avatar = models.ImageField(upload_to="users/avatars_users/", blank=True, null=True, verbose_name="Аватар",
-                               help_text="Загрузите свой аватар")
+    email = models.EmailField(
+        unique=True, verbose_name="Email", help_text="Укажите свой email"
+    )
+    phone = models.CharField(
+        max_length=35,
+        blank=True,
+        null=True,
+        verbose_name="Телефон",
+        help_text="Укажите свой телефон",
+    )
+    city = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Город",
+        help_text="Укажите свой город",
+    )
+    avatar = models.ImageField(
+        upload_to="users/avatars_users/",
+        blank=True,
+        null=True,
+        verbose_name="Аватар",
+        help_text="Загрузите свой аватар",
+    )
 
     USERNAME_FIELD = "email"  # устанавливаем email как поля для авторизации
     REQUIRED_FIELDS = []
@@ -68,6 +89,7 @@ class Payment(models.Model):
     Модель платежа.
     Хрнит информацию о транзакциях пользователей за курсы или уроки.
     """
+
     # Варианты способов оплаты
     PAYMENT_METHOD_CHOICES = [
         ("cash", "Наличные"),
@@ -133,6 +155,10 @@ class Payment(models.Model):
         """
         super().clean()
         if self.paid_course and self.paid_lesson:
-            raise ValidationError("Платеж не может быть одновременно за курс и за урок.")
+            raise ValidationError(
+                "Платеж не может быть одновременно за курс и за урок."
+            )
         if not self.paid_course and not self.paid_lesson:
-            raise ValidationError("Платеж должен быть связан либо с курсом, либо с уроком.")
+            raise ValidationError(
+                "Платеж должен быть связан либо с курсом, либо с уроком."
+            )
