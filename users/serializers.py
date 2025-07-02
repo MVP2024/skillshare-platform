@@ -40,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
             "avatar",
             "first_name",
             "last_name",
+            "last_login",
             "payments",
             "password",
         )
@@ -59,6 +60,7 @@ class UserSerializer(serializers.ModelSerializer):
                 # Удаляем конфиденциальные поля
                 ret.pop("last_name", None)
                 ret.pop("payments", None)
+                ret.pop("last_login", None)
                 # Поле 'password' уже write_only, поэтому оно не будет отображаться при GET-запросах.
         return ret
 

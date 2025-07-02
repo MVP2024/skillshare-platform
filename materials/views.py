@@ -39,7 +39,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         elif self.action == "destroy":
             # Удалять курсы могут только владельцы, которые НЕ являются модераторами
-            self.permission_classes = [IsAuthenticated, IsOwner, IsNotModerator]
+            self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
         else:  # list
             # Просматривать список курсов могут все аутентифицированные пользователи.
@@ -126,7 +126,7 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
         elif self.request.method == "DELETE":  # Destroy action
             # Удалять уроки могут только владельцы, которые не являются модераторами
-            self.permission_classes = [IsAuthenticated, IsOwner, IsNotModerator]
+            self.permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
         else:  # GET (retrieve)
             # Просматривать уроки могут все аутентифицированные пользователи

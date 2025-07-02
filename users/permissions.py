@@ -61,10 +61,8 @@ class IsOwnerOrModerator(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.user and request.user.is_authenticated:
-            # Проверяем, является ли пользователь владельцем
-            is_owner = IsOwner().has_object_permission(request, view, obj)
-            # Проверяем, является ли пользователь модератором
-            is_moderator = IsModerator().has_permission(request, view)
-            return is_owner or is_moderator
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            return IsOwner().has_object_permission(request, view, obj) or IsModerator().has_permission(request, view)
         return False
