@@ -31,33 +31,35 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Данные удалены."))
 
         fixture_name = "initial_data.json"
-        group_fixture_name = "groups.json"
+        # Путь к директории с фикстурами групп
+        group_fixtures_dir = Path(settings.BASE_DIR) / "users" / "fixtures"
 
-        # Формируем полный путь к файлу фикстуры
+        # Загрузка всех фикстур групп (ПЕРВЫМИ)
+        if group_fixtures_dir.exists():
+            group_fixture_files = sorted(group_fixtures_dir.glob("*.json"))
+            if group_fixture_files:
+                self.stdout.write("Загрузка фикстур групп...")
+                for group_file_path in group_fixture_files:
+                    group_filename = group_file_path.name
+                    self.stdout.write(f"  Загрузка {group_filename}...")
+                    call_command("loaddata", group_filename)
+                self.stdout.write(self.style.SUCCESS("Все фикстуры групп загружены."))
+            else:
+                self.stdout.write(
+                    self.style.WARNING("Файлы фикстур групп не найдены в 'users/fixtures/'.")
+                )
+        else:
+            self.stdout.write(
+                self.style.WARNING(f"Директория 'users/fixtures/' не найдена.")
+            )
+
+        # Загрузка основной фикстуры (ВТОРОЙ)
         fixture_path = Path(settings.BASE_DIR) / "materials" / "fixtures" / fixture_name
-        group_fixture_path = (
-            Path(settings.BASE_DIR) / "users" / "fixtures" / group_fixture_name
-        )
-
-        # Проверяем существование файла фикстуры перед загрузкой
         if fixture_path.exists():
             self.stdout.write("Загрузка фикстуры...")
-
-            # Вызываем встроенную команду Django 'loaddata' для загрузки данных
             call_command("loaddata", fixture_name)
             self.stdout.write(self.style.SUCCESS("Данные загружены."))
         else:
-            # Выводим предупреждение, если файл фикстуры не найден
             self.stdout.write(
                 self.style.WARNING(f"Фикстура '{fixture_name}' не найдена.")
-            )
-
-        # Загрузка фикстуры групп
-        if group_fixture_path.exists():
-            self.stdout.write("Загрузка фикстуры групп...")
-            call_command("loaddata", group_fixture_name)
-            self.stdout.write(self.style.SUCCESS("Фикстура групп загружена."))
-        else:
-            self.stdout.write(
-                self.style.WARNING(f"Фикстура групп '{group_fixture_name}' не найдена.")
             )
