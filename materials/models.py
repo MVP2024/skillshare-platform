@@ -34,7 +34,7 @@ class Course(models.Model):
         verbose_name="Владелец курса",
         related_name="courses",
         null=True,
-    )  # расскоментируй, чтобы урок оставался, когда владелец удалялся.
+    )
 
     class Meta:
         verbose_name = "Курс"
@@ -91,3 +91,36 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.course.title})"
+
+
+class CourseSubscription(models.Model):
+    """
+        Модель подписки пользователя на обновления курса.
+
+        Поля:
+        - user: Пользователь, который подписывается
+        - course: Курс, на который оформляется подписка
+        - created: Дата создания подписки
+        """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Пользователь'
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='subscribers',
+        verbose_name='Курс'
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Уникальность пары пользователь-курс, чтобы один пользователь не мог подписаться на один курс дважды
+        unique_together = ('user', 'course')
+        verbose_name = 'Подписка на курс'
+        verbose_name_plural = 'Подписки на курсы'
+
+    def __str__(self):
+        return f"{self.user} - {self.course}"
