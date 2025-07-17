@@ -24,17 +24,16 @@ class CourseLessonSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    # lessons_count = serializers.SerializerMethodField()
-    # lessons = CourseLessonSerializer(many=True, read_only=True)
-    #
-    # class Meta:
-    #     model = Course
-    #     fields = "__all__"
-    #
-    # def get_lessons_count(self, obj):
-    #     return obj.lessons.count()
-
+    lessons_count = serializers.SerializerMethodField()
+    lessons = CourseLessonSerializer(many=True, read_only=True)
     is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+
+    def get_lessons_count(self, obj):
+        return obj.lessons.count()
 
     def get_is_subscribed(self, obj):
         """Проверяет подписку текущего пользователя на курс"""
