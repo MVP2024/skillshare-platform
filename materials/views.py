@@ -1,15 +1,14 @@
-from rest_framework import generics, viewsets
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
-
-from materials.models import Course, Lesson, CourseSubscription
-from materials.serializers import CourseSerializer, LessonSerializer
-from users.permissions import IsNotModerator, IsOwner, IsOwnerOrModerator, IsOwnerOrSuperuser
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from materials.paginators import MaterialsPagination
 from django.shortcuts import get_object_or_404
+from rest_framework import generics, status, viewsets
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from materials.models import Course, CourseSubscription, Lesson
+from materials.paginators import MaterialsPagination
+from materials.serializers import CourseSerializer, LessonSerializer
+from users.permissions import (IsNotModerator, IsOwnerOrModerator,
+                               IsOwnerOrSuperuser)
 
 
 class CourseViewSet(viewsets.ModelViewSet):

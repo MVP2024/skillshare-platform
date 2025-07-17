@@ -1,17 +1,18 @@
-from django.urls import reverse
-from rest_framework.test import APITestCase, APIRequestFactory
-from rest_framework import status
-from django.contrib.auth import get_user_model
-from materials.models import Lesson, Course, CourseSubscription
-from django.contrib.auth.models import Group
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 from urllib.error import URLError
-from django.core.exceptions import ValidationError
-from materials.validators import validate_youtube_url
-from rest_framework.test import APIClient
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+
+from materials.models import Course, CourseSubscription, Lesson
+from materials.validators import validate_youtube_url
 
 User = get_user_model()
+
 
 class CourseViewSetTest(APITestCase):
     def setUp(self):
@@ -59,7 +60,7 @@ class CourseViewSetTest(APITestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_list_courses_non_moderator(self):
-        course_user_owned = Course.objects.create(title='User Course', course_user=self.user)
+        Course.objects.create(title='User Course', course_user=self.user)
         Course.objects.create(title='Other User Course', course_user=self.moderator)
 
         self.client.force_authenticate(self.user)
@@ -69,8 +70,8 @@ class CourseViewSetTest(APITestCase):
         self.assertEqual(response.data['results'][0]['title'], 'User Course')
 
     def test_list_courses_moderator_or_superuser(self):
-        course1 = Course.objects.create(title='Course 1', course_user=self.user)
-        course2 = Course.objects.create(title='Course 2', course_user=self.moderator)
+        Course.objects.create(title='Course 1', course_user=self.user)
+        Course.objects.create(title='Course 2', course_user=self.moderator)
 
         self.client.force_authenticate(self.moderator)
         response = self.client.get(reverse('materials:course-list'))
@@ -124,10 +125,10 @@ class LessonsCRUDTest(APITestCase):
         self.lessons_list_create_url = reverse('materials:lesson-list-create')
         self.lesson_detail_url = lambda pk: reverse('materials:lesson-detail', kwargs={'pk': pk})
 
-
     # Тесты на создание урока
     @patch('materials.validators.urlopen')
     def test_lesson_create_by_owner(self, mock_urlopen):  # mock_urlopen передается как аргумент теста
+
         # Настраиваем мок-объект для urlopen
         mock_response_object = MagicMock()
         mock_response_object.getcode.return_value = 200  # Убеждаемся, что getcode() вернет 200 (успех)

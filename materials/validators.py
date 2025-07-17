@@ -1,7 +1,8 @@
-from django.core.exceptions import ValidationError
 import re
-from urllib.request import urlopen
 from urllib.error import URLError
+from urllib.request import urlopen
+
+from django.core.exceptions import ValidationError
 
 
 def validate_youtube_url(value):

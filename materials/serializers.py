@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from materials.validators import validate_youtube_url
 
-from materials.models import Course, Lesson, CourseSubscription
+from materials.models import Course, Lesson
+from materials.validators import validate_youtube_url
 
 
 class LessonSerializer(serializers.ModelSerializer):

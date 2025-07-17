@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 )
         else:
             self.stdout.write(
-                self.style.WARNING(f"Директория 'users/fixtures/' не найдена.")
+                self.style.WARNING("Директория 'users/fixtures/' не найдена.")
             )
 
         # Загрузка основной фикстуры (ВТОРОЙ)

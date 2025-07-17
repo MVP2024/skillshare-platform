@@ -3,7 +3,7 @@ from rest_framework import filters, generics, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from users.models import Payment, User
-from users.permissions import IsOwner, IsOwnerOrModerator
+from users.permissions import IsOwnerOrModerator
 from users.serializers import PaymentSerializer, UserSerializer
 
 
