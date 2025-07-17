@@ -297,7 +297,7 @@
         "title": "Портфолио это просто",
         "description": "Создадим с нуля своё портфолио.",
         "preview": "lessons/previews/2025-06-30_14-55-08.png",
-        "video_link": "https://my.sky.pro/student-cabinet/stream-lesson/146997/homework-requirements",
+        "video_link": "https://www.youtube.com/watch?v=youtube1",
         "lesson_user": null
     }
 },
@@ -309,7 +309,7 @@
         "title": "Урок 1. Вводная часть.",
         "description": "Определим темпераменты людей.",
         "preview": "lessons/previews/2025-06-30_14-52-58.png",
-        "video_link": "https://yandex.ru/video/preview/7260739622712456111",
+        "video_link": "https://www.youtube.com/watch?v=youtube2",
         "lesson_user": null
     }
 },
@@ -319,9 +319,9 @@
     "fields": {
         "course": 1,
         "title": "Проект 1. Улучшаем поиск и сортировку товаров по критериям в яндекс-маркет",
-        "description": "1. Разберём проект полностью. \r\n2. Выявим всё, что используется и для чего.\r\n3. Выявим лучшие стороны.\r\n4. Выявим недочёты и не правильную логику.\r\n5. Подправим необходимое.\r\n6. Напишем тесты.",
+        "description": "1. Разберём проект полностью. \r\n2. Выявим всё, что используется и для чего.\r\n3. Выявим лучшие стороны.\r\n4. Выявим недочёты и не правильную логику.\r\n5. Подправим необход...",
         "preview": "lessons/previews/2025-06-30_14-50-57.png",
-        "video_link": "https://yandex.ru/video/preview/5492102865002256052",
+        "video_link": "https://www.youtube.com/watch?v=youtube3",
         "lesson_user": null
     }
 },
@@ -333,7 +333,7 @@
         "title": "Урок 1. Что такое Python? Его нюансы.",
         "description": "Краткое содержание. Создаём алгоритм. Рисуем себе схему. Делаем программу, что можно было получить с того или иного алгоритма.",
         "preview": "lessons/previews/2025-06-30_14-44-19.png",
-        "video_link": "https://stackoverflow.com/questions/11222440/how-to-create-a-reference-to-a-variable-in-python",
+        "video_link": "https://www.youtube.com/watch?v=youtube4",
         "lesson_user": null
     }
 }
