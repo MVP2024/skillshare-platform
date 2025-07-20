@@ -14,6 +14,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Добавьте ваш базовый URL
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000") # добавлен для тестирования
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -142,5 +145,5 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Documentation for SkillShare Platform API endpoints',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    # Otras настройки могут быть добавлены здесь по мере необходимости
+    # Pltcm настройки могут быть добавлены здесь по мере необходимости
 }
