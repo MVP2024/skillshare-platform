@@ -9,6 +9,9 @@ from users.serializers import PaymentSerializer, UserSerializer
 from rest_framework.response import Response
 from users.serializers import PaymentCreateSerializer
 from users.services import process_payment_and_create_stripe_session
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+import stripe
 
 
 @extend_schema(tags=["Users"])
@@ -245,3 +248,90 @@ class PaymentCreateAPIView(generics.CreateAPIView):
             }, status=status.HTTP_200_OK)
         except (ValueError, Exception) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(tags=["Stripe Callbacks"])
+class StripeSuccessView(APIView):
+    """
+    Обрабатывает успешные колбэки платежей от Stripe.
+    Извлекает сессию Stripe, обновляет локальный статус Payment на 'succeeded'.
+    """
+    permission_classes = []  # Аутентификация не требуется для колбэков Stripe
+
+    def get(self, request, *args, **kwargs):
+        session_id = request.GET.get('session_id')
+        if not session_id:
+            return Response({"error": "Session ID is missing."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            stripe_session = retrieve_stripe_session(session_id)
+
+            if stripe_session.payment_status == 'paid':
+                payment_id = stripe_session.metadata.get('payment_id')
+                if not payment_id:
+                    return Response({"error": "Payment ID missing in Stripe session metadata."},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                payment = get_object_or_404(Payment, id=payment_id)
+
+                if payment.status == 'succeeded':
+                    # Платеж уже обработан, нет необходимости обновлять снова
+                    return Response({"message": "Payment already processed successfully.", "payment_id": payment.id},
+                                    status=status.HTTP_200_OK)
+
+                payment.status = "succeeded"
+                # Очищаем stripe_id и payment_url, так как платеж завершен
+                payment.stripe_id = None
+                payment.payment_url = None
+                payment.save()
+
+                return Response({"message": "Payment successful!", "payment_id": payment.id}, status=status.HTTP_200_OK)
+            else:
+                # Если payment_status не 'paid', это может означать 'unpaid' или 'no_payment_required'.
+                # Для нашего случая, если нас перенаправили сюда, это подразумевает неудачу или отмену.
+                payment_id = stripe_session.metadata.get('payment_id')
+                if payment_id:
+                    payment = get_object_or_404(Payment, id=payment_id)
+                    if payment.status == 'pending':  # Обновляем только если статус еще "ожидает"
+                        payment.status = "failed"
+                        payment.save()
+                    return Response({"message": f"Payment not completed. Status: {stripe_session.payment_status}",
+                                     "payment_id": payment.id}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": f"Payment not completed. Status: {stripe_session.payment_status}"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        except stripe.error.InvalidRequestError as e:
+            return Response({"error": f"Invalid Stripe session ID or API error: {e}"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"An unexpected error occurred: {e}"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@extend_schema(tags=["Stripe Callbacks"])
+class StripeCancelView(APIView):
+    """
+    Обрабатывает колбэки отмены платежа от Stripe.
+    Обновляет локальный статус Payment на 'failed', если он был 'pending'.
+    """
+    permission_classes = []  # Аутентификация не требуется для колбэков Stripe
+
+    def get(self, request, *args, **kwargs):
+        session_id = request.GET.get('session_id')  # Stripe часто отправляет session_id и сюда
+
+        # При желании, можно получить сессию и обновить статус платежа на 'failed'
+        if session_id:
+            try:
+                stripe_session = retrieve_stripe_session(session_id)
+                payment_id = stripe_session.metadata.get('payment_id')
+                if payment_id:
+                    payment = get_object_or_404(Payment, id=payment_id)
+                    if payment.status == 'pending':
+                        payment.status = 'failed'
+                        payment.save()
+            except (stripe.error.InvalidRequestError, Exception) as e:
+                # Зарегистрируйте ошибку, но все равно верните сообщение об отмене пользователю/Stripe
+                print(f"Error processing Stripe cancel callback for session {session_id}: {e}")
+                pass
+
+        return Response({"message": "Payment cancelled by user."}, status=status.HTTP_200_OK)

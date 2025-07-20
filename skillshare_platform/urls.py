@@ -5,9 +5,10 @@ from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from skillshare_platform.views import CustomTokenObtainPairView, CustomTokenRefreshView
 from django.views.generic import RedirectView
+from users.views import StripeSuccessView, StripeCancelView
 
 urlpatterns = [
-re_path(r'^$', RedirectView.as_view(url='/api/schema/swagger-ui/', permanent=False)),
+    re_path(r'^$', RedirectView.as_view(url='/api/schema/swagger-ui/', permanent=False)),
     path("admin/", admin.site.urls),
     path("api/", include("materials.urls")),
     path("api/", include("users.urls")),
@@ -21,6 +22,9 @@ re_path(r'^$', RedirectView.as_view(url='/api/schema/swagger-ui/', permanent=Fal
         CustomTokenRefreshView.as_view(),
         name="token_refresh",
     ),
+    # Новые URL-адреса для колбэков Stripe на корневом уровне
+    path("success/", StripeSuccessView.as_view(), name="stripe-success"),
+    path("cancel/", StripeCancelView.as_view(), name="stripe-cancel"),
 
     # Пути для документации DRF Spectacular
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

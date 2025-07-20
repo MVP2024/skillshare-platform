@@ -29,24 +29,31 @@ def create_stripe_product(name: str):
         raise
 
 
-def create_stripe_price(amount: int, product_id: str):
+def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
     """
         Создает цену для продукта в Stripe.
             Аргументы:
                 amount (int): Сумма в минимальных единицах валюты (например, в копейках для рублей).
-                product_id (str): ID продукта Stripe, к которому привязывается цена.
+                stripe_product_id (str): ID продукта Stripe, к которому привязывается цена.
+                lookup_key (str): Уникальный ключ для быстрого поиска цены.
             Возвращает:
                 stripe.Price: Объект цены Stripe.
             Исключения:
-                stripe.error.StripeError: Если произошла ошибка при создании цены.
+                stripe.error.StripeError: Если произошла ошибка при создании/получении цены.
     """
     try:
+        # Попытаться найти существующую цену по lookup_key и product_id
+        existing_prices = stripe.Price.list(lookup_keys=[lookup_key], product=stripe_product_id)
+        if existing_prices.data:
+            print(f"Цена с lookup_key '{lookup_key}' для продукта '{stripe_product_id}' уже существует, используем её.")
+            return existing_prices.data[0]  # Вернуть первую найденную цену
+
+        # Если цена не найдена, создать новую
         price = stripe.Price.create(
             currency="rub",  # Валюта - рубли. Можно изменить на "usd" или другую.
             unit_amount=amount,  # Сумма в копейках (умножаем на 100)
-            product_data={"name": "Платный материал"},  # Обязательное поле, даже если есть product_id
-            lookup_keys=['sample_price'],
-            transfer_lookup_key=True
+            product=stripe_product_id,  # Используем ID существующего продукта
+            lookup_key=lookup_key,  # Используем динамический lookup_key
         )
         return price
     except stripe.error.StripeError as e:
@@ -125,6 +132,8 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
     amount_to_pay = 0
     item_type = ""
 
+    # Генерируем уникальный lookup_key для цены на основе ID курса/урока
+    price_lookup_key = ""
     if paid_course_id:
         try:
             course = Course.objects.get(pk=paid_course_id)
@@ -132,6 +141,7 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
             item_type = "курс"
             # Суммируем стоимости всех уроков в курсе
             amount_to_pay = course.lessons.aggregate(total_amount=Sum('price'))['total_amount'] or 0
+            price_lookup_key = f"course_{paid_course_id}_price"
         except Course.DoesNotExist:
             raise ValueError("Курс не найден.")
     elif paid_lesson_id:
@@ -140,6 +150,7 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
             item_title = lesson.title
             item_type = "урок"
             amount_to_pay = lesson.price
+            price_lookup_key = f"lesson_{paid_lesson_id}_price"
         except Lesson.DoesNotExist:
             raise ValueError("Урок не найден.")
 
@@ -204,8 +215,9 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
         # Создаем продукт в Stripe
         stripe_product = create_stripe_product(item_title)
 
-        # Создаем цену в Stripe (сумма в копейках)
-        stripe_price = create_stripe_price(int(amount_to_pay * 100), stripe_product.id)
+        # Создаем или получаем цену в Stripe (сумма в копейках)
+        # Эта строка была дублирована и одна из них была неполной
+        stripe_price = create_stripe_price(int(amount_to_pay * 100), stripe_product.id, price_lookup_key)
 
         # Создаем сессию оплаты Stripe
         checkout_session = create_stripe_checkout_session(stripe_price.id, payment.id)
