@@ -20,12 +20,20 @@ def create_stripe_product(name: str):
                 stripe.error.StripeError: Если произошла ошибка при создании продукта.
     """
     try:
+        # Попытаться найти существующий продукт по имени
+        products = stripe.Product.list(limit=1, name=name)
+        if products.data:
+            print(f"Продукт '{name}' уже существует, используем его.")
+            return products.data[0]
+
+        # Если продукт не найден, создать новый
         product = stripe.Product.create(
             name=name,
+            active=True,  # Убедитесь, что продукт активен
         )
         return product
     except stripe.error.StripeError as e:
-        print(f"Ошибка при создании продукта Stripe: {e}")
+        print(f"Ошибка при создании/получении продукта Stripe: {e}")
         raise
 
 
@@ -43,9 +51,16 @@ def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
     """
     try:
         # Попытаться найти существующую цену по lookup_key и product_id
-        existing_prices = stripe.Price.list(lookup_keys=[lookup_key], product=stripe_product_id)
+        # Это гарантирует, что мы найдем точную цену, если она уже существует.
+        existing_prices = stripe.Price.list(
+            lookup_keys=[lookup_key],
+            product = stripe_product_id,
+            unit_amount = amount,  # Добавлено для точного соответствия суммы
+            currency = "rub",  # Добавлено для точного соответствия валюты
+            active = True  # Учитывать только активные цены
+        )
         if existing_prices.data:
-            print(f"Цена с lookup_key '{lookup_key}' для продукта '{stripe_product_id}' уже существует, используем её.")
+            print(f"Цена с lookup_key '{lookup_key}', суммой {amount} и продуктом '{stripe_product_id}' уже существует, используем её.")
             return existing_prices.data[0]  # Вернуть первую найденную цену
 
         # Если цена не найдена, создать новую
@@ -54,6 +69,7 @@ def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
             unit_amount=amount,  # Сумма в копейках (умножаем на 100)
             product=stripe_product_id,  # Используем ID существующего продукта
             lookup_key=lookup_key,  # Используем динамический lookup_key
+            active=True,
         )
         return price
     except stripe.error.StripeError as e:
@@ -133,15 +149,16 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
     item_type = ""
 
     # Генерируем уникальный lookup_key для цены на основе ID курса/урока
+    # Это важно, так как цены в Stripe неизменяемы, и lookup_key должен быть уникальным для конкретной цены.
     price_lookup_key = ""
     if paid_course_id:
         try:
             course = Course.objects.get(pk=paid_course_id)
             item_title = course.title
             item_type = "курс"
-            # Суммируем стоимости всех уроков в курсе
-            amount_to_pay = course.lessons.aggregate(total_amount=Sum('price'))['total_amount'] or 0
-            price_lookup_key = f"course_{paid_course_id}_price"
+            amount_to_pay = course.actual_price
+            # Добавляем сумму (в копейках) к lookup_key
+            price_lookup_key = f"course_{paid_course_id}_price_{int(amount_to_pay * 100)}"
         except Course.DoesNotExist:
             raise ValueError("Курс не найден.")
     elif paid_lesson_id:
@@ -150,7 +167,8 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
             item_title = lesson.title
             item_type = "урок"
             amount_to_pay = lesson.price
-            price_lookup_key = f"lesson_{paid_lesson_id}_price"
+            # Добавляем сумму (в копейках) к lookup_key
+            price_lookup_key = f"lesson_{paid_lesson_id}_price_{int(amount_to_pay * 100)}"
         except Lesson.DoesNotExist:
             raise ValueError("Урок не найден.")
 
@@ -182,14 +200,14 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
             }
 
     # Если existing_succeeded_payment отсутствует, или если он был 'free' для теперь платного материала:
-    if amount_to_pay <=0:
+    if amount_to_pay <= 0:
         # Создаём запись платежа как бесплатное "приобретение"
         payment = Payment.objects.create(
             user=user,
             paid_course_id=paid_course_id,
             paid_lesson_id=paid_lesson_id,
             amount=amount_to_pay,
-            payment_method="free",  # Новый метод оплаты
+            payment_method="free",
             status="succeeded",  # Сразу успешный статус
         )
         return {
@@ -216,7 +234,6 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
         stripe_product = create_stripe_product(item_title)
 
         # Создаем или получаем цену в Stripe (сумма в копейках)
-        # Эта строка была дублирована и одна из них была неполной
         stripe_price = create_stripe_price(int(amount_to_pay * 100), stripe_product.id, price_lookup_key)
 
         # Создаем сессию оплаты Stripe
