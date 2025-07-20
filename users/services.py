@@ -123,11 +123,13 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
 
     item_title = ""
     amount_to_pay = 0
+    item_type = ""
 
     if paid_course_id:
         try:
             course = Course.objects.get(pk=paid_course_id)
             item_title = course.title
+            item_type = "курс"
             # Суммируем стоимости всех уроков в курсе
             amount_to_pay = course.lessons.aggregate(total_amount=Sum('price'))['total_amount'] or 0
         except Course.DoesNotExist:
@@ -136,13 +138,58 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
         try:
             lesson = Lesson.objects.get(pk=paid_lesson_id)
             item_title = lesson.title
+            item_type = "урок"
             amount_to_pay = lesson.price
         except Lesson.DoesNotExist:
             raise ValueError("Урок не найден.")
 
-    if amount_to_pay <=0:
-        raise ValueError("Сумма оплаты должна быть больше нуля.")
+    # Проверка на существующие успешные "приобретения"
+    existing_succeeded_payment = Payment.objects.filter(
+        user=user,
+        status="succeeded",
+        paid_course_id=paid_course_id,
+        paid_lesson_id=paid_lesson_id,
+    ).first()
 
+    if existing_succeeded_payment:
+        if amount_to_pay > 0:  # Если материал теперь платный
+            if existing_succeeded_payment.payment_method == "free":
+                # Материал был получен бесплатно, но теперь он платный.
+                # Продолжаем процесс оплаты, позволяя пользователю оплатить его.
+                pass
+            else:
+                # Материал был оплачен ранее платным способом. Повторная покупка не требуется.
+                raise ValueError(f"Вы уже приобрели этот {item_type} '{item_title}'. Повторная покупка не требуется.")
+        else:  # Если материал остался бесплатным (amount_to_pay <= 0)
+            # Материал уже был получен (бесплатно или платно). Нет необходимости в повторной "покупке".
+            return {
+                "payment_id": existing_succeeded_payment.id,
+                "payment_url": None,
+                "amount": existing_succeeded_payment.amount,
+                "status": existing_succeeded_payment.status,
+                "message": f"Вы уже приобрели этот {item_type} '{item_title}'. Оплата не требуется.",
+            }
+
+    # Если existing_succeeded_payment отсутствует, или если он был 'free' для теперь платного материала:
+    if amount_to_pay <=0:
+        # Создаём запись платежа как бесплатное "приобретение"
+        payment = Payment.objects.create(
+            user=user,
+            paid_course_id=paid_course_id,
+            paid_lesson_id=paid_lesson_id,
+            amount=amount_to_pay,
+            payment_method="free",  # Новый метод оплаты
+            status="succeeded",  # Сразу успешный статус
+        )
+        return {
+            "payment_id": payment.id,
+            "payment_url": None,  # Нет URL для оплаты
+            "amount": payment.amount,
+            "status": payment.status,
+            "message": f"Данный {item_type} '{item_title}' является бесплатным, оплата не требуется.",
+        }
+
+    # Если материал платный (amount_to_pay > 0) и не был успешно приобретен ранее (или был приобретен бесплатно, а теперь стал платным)
     # Создаём запись платежа в вашей системе со статусом pending
     payment = Payment.objects.create(
         user=user,
