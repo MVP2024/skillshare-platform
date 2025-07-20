@@ -2,10 +2,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
-
+from rest_framework import status
 from users.models import Payment, User
 from users.permissions import IsOwnerOrModerator
 from users.serializers import PaymentSerializer, UserSerializer
+from rest_framework.response import Response
+from users.serializers import PaymentCreateSerializer
+from users.services import process_payment_and_create_stripe_session
 
 
 @extend_schema(tags=["Users"])
@@ -198,3 +201,47 @@ class PaymentListAPIView(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+
+@extend_schema(tags=["Payments"])
+class PaymentCreateAPIView(generics.CreateAPIView):
+    """
+        API View для создания новой платежной сессии Stripe.
+        Принимает course_id или lesson_id и возвращает URL для оплаты.
+    """
+    serializer_class = PaymentCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Инициировать новый платеж через Stripe",
+        description="Создает новую платежную сессию для курса или урока и возвращает URL для оплаты. "
+                    "Необходимо указать либо 'paid_course', либо 'paid_lesson'.",
+        request=PaymentCreateSerializer,
+        responses={
+            200: PaymentCreateSerializer,
+            400: {"description": "Неверные входные данные или ошибка Stripe"},
+            401: {"description": "Неавторизованный доступ"},
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        paid_course_id = serializer.validated_data.get('paid_course')
+        paid_lesson_id = serializer.validated_data.get('paid_lesson')
+
+        try:
+            payment_info = process_payment_and_create_stripe_session(
+                user=request.user,
+                paid_course_id=paid_course_id.id if paid_course_id else None,
+                paid_lesson_id=paid_lesson_id.id if paid_lesson_id else None,
+            )
+            # Возвращаем данные, которые ожидает PaymentCreateSerializer
+            return Response({
+                "payment_id": payment_info["payment_id"],
+                "payment_url": payment_info["payment_url"],
+                "amount": payment_info["amount"],
+                "status": payment_info["status"],
+            }, status=status.HTTP_200_OK)
+        except (ValueError, Exception) as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
