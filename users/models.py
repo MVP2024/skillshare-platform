@@ -96,6 +96,7 @@ class Payment(models.Model):
         ("transfer", "Перевод на счет"),
         ("make_qr_code", "Перевод по QR-коду"),
         ("stripe", "Stripe"),
+        ("free", "Бесплатно"),
     ]
 
     # Статусы платежа
