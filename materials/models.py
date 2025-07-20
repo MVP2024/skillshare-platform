@@ -77,6 +77,13 @@ class Lesson(models.Model):
         verbose_name="Ссылка на видео",
         help_text="Укажите ссылку на видео",
     )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        verbose_name="Стоимость урока",
+        help_text="Укажите стоимость урока",
+    )
     lesson_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
