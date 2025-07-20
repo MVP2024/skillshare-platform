@@ -18,7 +18,7 @@ def validate_youtube_url(value):
     if value is None or value == "":
         # Если значение отсутствует, не проводим дальнейшую валидацию.
         # Опциональность поля обрабатывается на уровне модели/сериализатора.
-        return
+        raise ValidationError("URL слишком длинный или пустой")
 
     if len(value) > 1024:  # максимальная длина URL
         raise ValidationError("URL слишком длинный или пустой")
