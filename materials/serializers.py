@@ -32,10 +32,10 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = "__all__"
 
-    def get_lessons_count(self, obj):
+    def get_lessons_count(self, obj) -> int:
         return obj.lessons.count()
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, obj) -> bool:
         """Проверяет подписку текущего пользователя на курс"""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
