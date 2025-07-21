@@ -168,6 +168,7 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
     item_title = ""
     amount_to_pay = 0
     item_type = ""
+    price_lookup_key = ""
 
     # Определение типа и стоимости оплачиваемого материала
     if paid_course_id:
