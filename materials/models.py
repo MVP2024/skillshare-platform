@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum
+from django.utils import timezone
 
 
 class Course(models.Model):
@@ -43,6 +44,13 @@ class Course(models.Model):
         null=True,
         verbose_name="Фиксированная стоимость",
         help_text="Укажите фиксированную стоимость курса. Если пусто, стоимость будет рассчитана по урокам.",
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        null=True,
+        blank=True,
+        verbose_name="Дата последнего обновления курса",
+        help_text="Время последнего обновления курса. Используется для контроля частоты уведомлений."
     )
 
     @property
