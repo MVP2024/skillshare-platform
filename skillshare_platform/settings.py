@@ -168,7 +168,7 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
 # Часовой пояс для задач, особенно важно для Celery Beat.
-CELERY_TIMEZONE = "UTC" # Используем UTC, чтобы избежать проблем с часовыми поясами
+CELERY_TIMEZONE = "Europe/Moscow" # Используем UTC, чтобы избежать проблем с часовыми поясами
 
 # Настройки Celery Beat для периодических задач.
 # Это словарь, где ключи - это имена задач, а значения - их расписание.
