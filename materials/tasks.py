@@ -27,7 +27,8 @@ def send_course_update_notification(course_id: int):
         subscriptions = CourseSubscription.objects.filter(course=course)
 
         if not subscriptions.exists():
-            logger.info(f"Нет активных подписчиков на курс '{course.title}' (ID: {course_id}). Уведомления не отправлены.")
+            logger.info(
+                f"Нет активных подписчиков на курс '{course.title}' (ID: {course_id}). Уведомления не отправлены.")
             return
 
         subject = f"Обновление курса: '{course.title}'"
@@ -45,7 +46,8 @@ def send_course_update_notification(course_id: int):
             logger.warning(f"На курсе '{course.title}' (ID: {course_id}) нет подписчиков с валидными email-адресами.")
             return
 
-        logger.info(f"Отправка уведомлений об обновлении курса '{course.title}' (ID: {course_id}) для {len(recipient_list)} подписчиков...")
+        logger.info(
+            f"Отправка уведомлений об обновлении курса '{course.title}' (ID: {course_id}) для {len(recipient_list)} подписчиков...")
 
         send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
@@ -62,12 +64,15 @@ def deactivate_inactive_users():
     """
     Фоновая задача Celery для деактивации пользователей, которые
     не заходили на сайт более одного месяца.
+    После деактивации пользователю отправляется уведомление по электронной почте.
 
     Эта задача запускается Celery Beat по расписанию,
     определенному в настройках Django (CELERY_BEAT_SCHEDULE).
     """
     # Определяем порог неактивного пользователя: текущее время минус 30 дней
     month_ago = timezone.now() - datetime.timedelta(days=30)
+
+    logger.info(f"Начало проверки неактивных пользователей. Порог: {month_ago}")
 
     # Находим пользователей, которые активны, не являются суперпользователями
     # и их последний вход был раньше, чем месяц назад.
@@ -79,8 +84,42 @@ def deactivate_inactive_users():
     )
 
     if inactive_users.exists():
+        # Собираем email-адреса пользователей перед деактивацией
+        deactivated_user_emails = [user.email for user in inactive_users if user.email]
+        # Добавим лог с пользователями, которые будут деактивированы
+        logger.info(f"Найдены пользователи для деактивации: {deactivated_user_emails}")
+
         # Обновляем флаг is_active для найденных пользователей
         count = inactive_users.update(is_active=False)
         logger.info(f"Деактивировано {count} неактивных пользователей.")
+
+        # Отправляем уведомления деактивированным пользователям
+        subject = "Ваш аккаунт на SkillShare был деактивирован"
+        message = (
+            "Уважаемый пользователь!\n\n"
+            "Ваш аккаунт на платформе SkillShare был деактивирован из-за длительного периода не активности (более 30 дней).\n"
+            "Это сделано для обеспечения безопасности и управления ресурсами платформы.\n\n"
+            "Если вы хотите восстановить доступ к своему аккаунту, пожалуйста, свяжитесь с нашей службой поддержки по адресу support@skillshare.com.\n\n"
+            "С уважением,\n"
+            "Команда SkillShare."
+        )
+        from_email = settings.DEFAULT_FROM_EMAIL
+
+        if deactivated_user_emails:
+            try:
+                # отправляем письмо каждому пользователю индивидуально
+                for email in deactivated_user_emails:
+                    send_mail(
+                        subject,
+                        message,
+                        from_email,
+                        [email],  # Передаем адрес как список из одного элемента
+                        fail_silently=False
+                    )
+                logger.info(f"Уведомления о деактивации отправлены для {len(deactivated_user_emails)} пользователей.")
+            except Exception as e:
+                logger.error(f"Ошибка при отправке уведомлений о деактивации пользователей: {e}", exc_info=True)
+        else:
+            logger.info("Нет email-адресов для отправки уведомлений о деактивации.")
     else:
         logger.info("Не найдено пользователей для деактивации.")

@@ -178,14 +178,14 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(minutes=1), # Запускать задачу каждую минуту
         "args": (), # Аргументы, передаваемые задаче
         "kwargs": {}, # Именованные аргументы, передаваемые задаче
-        "options": {"queue": "default"}, # Опционально: указать очередь, в которую будет отправлена задача
+        "options": {"queue": "celery"}, # Опционально: указать очередь, в которую будет отправлена задача
         "name": "Отладочная задача каждую минуту", # имя для админки Celery Beat
         "relative": False, # Относительно времени запуска Beat
     },
     "deactivate_inactive_users_daily": {
         "task": "materials.tasks.deactivate_inactive_users", # Полный путь к новой задаче
-        "schedule": timedelta(days=1), # Запускать задачу раз в день
-        "options": {"queue": "default"},
+        "schedule": timedelta(days=30), # Запускать задачу раз в день
+        "options": {"queue": "celery"},
         "name": "Деактивация неактивных пользователей",
     },
     # Здесь можно добавлять другие периодические задачи
@@ -204,3 +204,4 @@ EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "webmaster@localhost")
