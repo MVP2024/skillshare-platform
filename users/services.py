@@ -73,7 +73,7 @@ def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
         )
         if existing_prices.data:
             print(
-                f"Цена с lookup_key '{lookup_key}', суммой {amount} и продуктом '{stripe_product_id}' уже существует, используем её.")
+                f"Цена с lookup_key '{lookup_key}', суммой {amount / 100.0:.2f} и продуктом '{stripe_product_id}' уже существует, используем её.")
             return existing_prices.data[0]  # Вернуть первую найденную цену
 
         # Если цена не найдена, создать новую
