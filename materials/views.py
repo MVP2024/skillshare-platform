@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
@@ -24,6 +25,11 @@ class CourseViewSet(viewsets.ModelViewSet):
     pagination_class = MaterialsPagination
 
     def get_queryset(self):
+        # Если запрос от DRF Spectacular для генерации схемы, возвращаем пустой QuerySet.
+        # Это предотвращает ошибки, связанные с доступом к request.user для анонимного пользователя.
+        if getattr(self, "swagger_fake_view", False):
+            return Course.objects.none()
+
         # Если пользователь не является суперпользователем и не входит в группу модераторов,
         # он видит только свои курсы. В противном случае (модератор/админ) видит все курсы.
         if (
@@ -59,7 +65,67 @@ class CourseViewSet(viewsets.ModelViewSet):
         """
         serializer.save(course_user=self.request.user)
 
+    @extend_schema(
+        summary="Создание курса",
+        description="Позволяет авторизованным пользователям (не модераторам) создавать новые курсы.",
+        tags=["Courses"]
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
+    @extend_schema(
+        summary="Получение списка курсов",
+        description="Получает список курсов. Пользователи видят только свои курсы, модераторы и администраторы — все курсы.",
+        tags=["Courses"]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Получение деталей курса",
+        description="Получает подробную информацию о конкретном курсе. Доступно владельцам, модераторам и администраторам.",
+        tags=["Courses"]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Обновление курса",
+        description="Позволяет владельцу или модератору обновить информацию о курсе.",
+        tags=["Courses"]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Частичное обновление курса",
+        description="Позволяет владельцу или модератору частично обновить информацию о курсе.",
+        tags=["Courses"]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Удаление курса",
+        description="Позволяет владельцу или администратору удалить курс. Модераторам удаление запрещено.",
+        tags=["Courses"]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+
+@extend_schema(
+    methods=["GET"],
+    summary="Получение списка уроков",
+    description="Получает список уроков. Пользователи видят только свои уроки, модераторы и администраторы — все уроки.",
+    tags=["Lessons"]
+)
+@extend_schema(
+    methods=["POST"],
+    summary="Создание урока",
+    description="Позволяет авторизованным пользователям (не модераторам) создавать новые уроки.",
+    tags=["Lessons"]
+)
 class LessonListCreateAPIView(generics.ListCreateAPIView):
     """
     Generic-класс для получения списка уроков и создания нового урока.
@@ -71,6 +137,10 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
     pagination_class = MaterialsPagination
 
     def get_queryset(self):
+        # Если запрос от DRF Spectacular для генерации схемы, возвращаем пустой QuerySet.
+        if getattr(self, "swagger_fake_view", False):
+            return Lesson.objects.none()
+
         # Если пользователь не является суперпользователем и не входит в группу модераторов,
         # он видит только свои уроки. В противном случае (модератор/админ) видит все уроки.
         # Уроки фильтруются по полю lesson_user (владелец урока).
@@ -101,6 +171,24 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(lesson_user=self.request.user)
 
 
+@extend_schema(
+    methods=["GET"],
+    summary="Получение деталей урока",
+    description="Получает подробную информацию о конкретном уроке. Доступно владельцам, модераторам и администраторам.",
+    tags=["Lessons"]
+)
+@extend_schema(
+    methods=["PUT", "PATCH"],
+    summary="Обновление урока",
+    description="Позволяет владельцу или модератору обновить информацию о уроке.",
+    tags=["Lessons"]
+)
+@extend_schema(
+    methods=["DELETE"],
+    summary="Удаление урока",
+    description="Позволяет владельцу или администратору удалить урок. Модераторам удаление запрещено.",
+    tags=["Lessons"]
+)
 class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic-класс для получения, обновления и удаления конкретного урока.
@@ -111,6 +199,10 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LessonSerializer
 
     def get_queryset(self):
+        # Если запрос от DRF Spectacular для генерации схемы, возвращаем пустой QuerySet.
+        if getattr(self, "swagger_fake_view", False):
+            return Lesson.objects.none()
+
         # Для действий с одним объектом, также фильтруем queryset, чтобы предотвратить доступ
         # к чужим объектам через прямой URL для не-модераторов.
         if (
@@ -152,6 +244,19 @@ class CourseSubscriptionView(APIView):
     - message - статус операции (добавлена/удалена)
     """
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Подписка/отписка на курс",
+        description="Позволяет пользователю подписаться на курс или отписаться, если ужн подписан. Требует `course_id` в теле запроса.",
+        request={"application/json": {"course_id": {"type": "integer", "description": "ID курса"}}},
+        responses={
+            200: {"description": "Успешная операция подписки/отписки"},
+            400: {"description": "Неверный запрос (например, отсутствует course_id)"},
+            401: {"description": "Неавторизованный доступ"},
+            404: {"description": "Курс не найден"}
+        },
+        tags=["Courses"]
+    )
 
     def post(self, request, *args, **kwargs):
         user = request.user
