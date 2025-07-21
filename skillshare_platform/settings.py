@@ -184,3 +184,17 @@ CELERY_BEAT_SCHEDULE = {
     },
     # Здесь можно добавлять другие периодические задачи
 }
+
+# Настройки Email
+# EMAIL_BACKEND по умолчанию устанавливается в console.EmailBackend для разработки.
+# Для использования реальной отправки через SMTP, установите EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+# в вашем .env файле.
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
