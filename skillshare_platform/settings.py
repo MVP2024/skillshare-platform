@@ -145,7 +145,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Documentation for SkillShare Platform API endpoints',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    # Pltcm настройки могут быть добавлены здесь по мере необходимости
+    # Здесь настройки могут быть добавлены здесь по мере необходимости
 }
 
 # Настройки Celery
