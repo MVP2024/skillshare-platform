@@ -25,6 +25,11 @@ class CourseViewSet(viewsets.ModelViewSet):
     pagination_class = MaterialsPagination
 
     def get_queryset(self):
+        # Если запрос от DRF Spectacular для генерации схемы, возвращаем пустой QuerySet.
+        # Это предотвращает ошибки, связанные с доступом к request.user для анонимного пользователя.
+        if getattr(self, "swagger_fake_view", False):
+            return Course.objects.none()
+
         # Если пользователь не является суперпользователем и не входит в группу модераторов,
         # он видит только свои курсы. В противном случае (модератор/админ) видит все курсы.
         if (
@@ -132,6 +137,10 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
     pagination_class = MaterialsPagination
 
     def get_queryset(self):
+        # Если запрос от DRF Spectacular для генерации схемы, возвращаем пустой QuerySet.
+        if getattr(self, "swagger_fake_view", False):
+            return Lesson.objects.none()
+
         # Если пользователь не является суперпользователем и не входит в группу модераторов,
         # он видит только свои уроки. В противном случае (модератор/админ) видит все уроки.
         # Уроки фильтруются по полю lesson_user (владелец урока).
@@ -190,6 +199,10 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LessonSerializer
 
     def get_queryset(self):
+        # Если запрос от DRF Spectacular для генерации схемы, возвращаем пустой QuerySet.
+        if getattr(self, "swagger_fake_view", False):
+            return Lesson.objects.none()
+
         # Для действий с одним объектом, также фильтруем queryset, чтобы предотвратить доступ
         # к чужим объектам через прямой URL для не-модераторов.
         if (
