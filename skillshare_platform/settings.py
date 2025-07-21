@@ -182,6 +182,12 @@ CELERY_BEAT_SCHEDULE = {
         "name": "Отладочная задача каждую минуту", # имя для админки Celery Beat
         "relative": False, # Относительно времени запуска Beat
     },
+    "deactivate_inactive_users_daily": {
+        "task": "materials.tasks.deactivate_inactive_users", # Полный путь к новой задаче
+        "schedule": timedelta(days=1), # Запускать задачу раз в день
+        "options": {"queue": "default"},
+        "name": "Деактивация неактивных пользователей",
+    },
     # Здесь можно добавлять другие периодические задачи
 }
 
