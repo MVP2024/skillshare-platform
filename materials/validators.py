@@ -15,7 +15,12 @@ def validate_youtube_url(value):
         - https://youtube.com/embed/dQw4w9WgXcQ
         - https://www.youtube.com/v/dQw4w9WgXcQ
         """
-    if not value or len(value) > 1024:  # максимальная длина URL
+    if value is None or value == "":
+        # Если значение отсутствует, не проводим дальнейшую валидацию.
+        # Опциональность поля обрабатывается на уровне модели/сериализатора.
+        raise ValidationError("URL слишком длинный или пустой")
+
+    if len(value) > 1024:  # максимальная длина URL
         raise ValidationError("URL слишком длинный или пустой")
 
     youtube_regex = (

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from users.models import Payment, User
+from materials.models import Course, Lesson
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -16,6 +17,32 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"
+
+
+class PaymentCreateSerializer(serializers.Serializer):
+    """
+    Сериализатор для создания нового платежа (инициирования Stripe сессии).
+    Требуется либо paid_course, либо paid_lesson, но не оба.
+    Возвращает payment_url, amount, status и payment_id для клиента.
+    """
+    paid_course = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all(), required=False, allow_null=True)
+    paid_lesson = serializers.PrimaryKeyRelatedField(queryset=Lesson.objects.all(), required=False, allow_null=True)
+
+    # Эти поля будут возвращены представлением после обработки платежа
+    payment_url = serializers.URLField(read_only=True)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    status = serializers.CharField(read_only=True)
+    payment_id = serializers.IntegerField(read_only=True)
+
+    def validate(self, data):
+        paid_course = data.get('paid_course')
+        paid_lesson = data.get('paid_lesson')
+
+        if not paid_course and not paid_lesson:
+            raise serializers.ValidationError("Необходимо указать либо paid_course, либо paid_lesson.")
+        if paid_course and paid_lesson:
+            raise serializers.ValidationError("Нельзя указать одновременно paid_course и paid_lesson.")
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):

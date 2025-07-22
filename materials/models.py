@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum
 
 
 class Course(models.Model):
@@ -35,6 +36,34 @@ class Course(models.Model):
         related_name="courses",
         null=True,
     )
+    fixed_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Фиксированная стоимость",
+        help_text="Укажите фиксированную стоимость курса. Если пусто, стоимость будет рассчитана по урокам.",
+    )
+
+    @property
+    def calculated_price_from_lessons(self):
+        """
+        Возвращает общую стоимость курса, суммируя цены всех связанных уроков.
+        """
+        # 'lessons' - это related_name из ForeignKey в модели Lesson
+        return self.lessons.aggregate(total_amount=Sum('price'))['total_amount'] or 0.00
+
+    @property
+    def actual_price(self):
+        """
+        Возвращает актуальную стоимость курса: фиксированную, если она задана,
+        и больше нуля, иначе - рассчитанную из стоимости уроков.
+        """
+        # Если fixed_price задан и он больше нуля, используем его
+        if self.fixed_price is not None and self.fixed_price > 0:
+            return self.fixed_price
+        # Иначе используем рассчитанную стоимость по урокам
+        return self.calculated_price_from_lessons
 
     class Meta:
         verbose_name = "Курс"
@@ -76,6 +105,13 @@ class Lesson(models.Model):
         null=True,
         verbose_name="Ссылка на видео",
         help_text="Укажите ссылку на видео",
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        verbose_name="Стоимость урока",
+        help_text="Укажите стоимость урока",
     )
     lesson_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

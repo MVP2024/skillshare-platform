@@ -24,7 +24,7 @@
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$1000000$oEU2QhADlXHI7qVpB6m6z5$i/tHAfJ7mc+1KC7gauLwq0qW1f2r3e64QfG52l21gUE=",
-        "last_login": null,
+        "last_login": "2025-07-21T08:03:51.257Z",
         "is_superuser": false,
         "first_name": "Елена",
         "last_name": "Красивая",
@@ -146,7 +146,7 @@
     "pk": 8,
     "fields": {
         "password": "pbkdf2_sha256$1000000$iPDEZ48wDlfP18pAbWvEIF$gOvYA9IjMLd/FgQaVijXv0/viDIhZmHu5WKBiDJOwu0=",
-        "last_login": "2025-07-01T15:08:38.712Z",
+        "last_login": "2025-07-21T07:39:13.474Z",
         "is_superuser": true,
         "first_name": "Хозяин",
         "last_name": "Леса",
@@ -210,7 +210,10 @@
         "paid_course": 2,
         "paid_lesson": null,
         "amount": "200.00",
-        "payment_method": "make_qr_code"
+        "payment_method": "make_qr_code",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
     }
 },
 {
@@ -222,7 +225,10 @@
         "paid_course": null,
         "paid_lesson": 3,
         "amount": "200.00",
-        "payment_method": "transfer"
+        "payment_method": "transfer",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
     }
 },
 {
@@ -234,7 +240,10 @@
         "paid_course": 3,
         "paid_lesson": null,
         "amount": "500.00",
-        "payment_method": "make_qr_code"
+        "payment_method": "make_qr_code",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
     }
 },
 {
@@ -246,7 +255,115 @@
         "paid_course": 4,
         "paid_lesson": null,
         "amount": "100.00",
-        "payment_method": "cash"
+        "payment_method": "cash",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 5,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:49:29.611Z",
+        "paid_course": null,
+        "paid_lesson": 5,
+        "amount": "2000.00",
+        "payment_method": "stripe",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "succeeded"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 6,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:53:10.869Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "4000.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a18SM9Sn9whXj0gmrnDag4MY1ZF07qiQxPJSDy2NAgqyFvim8VbnwLUnxo",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a18SM9Sn9whXj0gmrnDag4MY1ZF07qiQxPJSDy2NAgqyFvim8VbnwLUnxo#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 7,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:53:45.773Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "0.00",
+        "payment_method": "free",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "succeeded"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 8,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:54:40.100Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "11999.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a1nn3KIGJZ8l4YB7v7WEslKLi6s9bqJ0zrX88FsZaTzl0ylJtDB3Pm69Qm",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a1nn3KIGJZ8l4YB7v7WEslKLi6s9bqJ0zrX88FsZaTzl0ylJtDB3Pm69Qm#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 9,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T08:00:04.782Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "11999.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a1FxggkhQkJzUQdOsZlOPBb9QZAY5qeISlLJSMjTKpDWJx9XNSDsXR4geY",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a1FxggkhQkJzUQdOsZlOPBb9QZAY5qeISlLJSMjTKpDWJx9XNSDsXR4geY#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 10,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T08:04:11.693Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "11999.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a1rwJYI8CBlGxB3jrNyM18aYekbBLVmGc1n1SWWVpUusbEgSr4mDZGx7kQ",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a1rwJYI8CBlGxB3jrNyM18aYekbBLVmGc1n1SWWVpUusbEgSr4mDZGx7kQ#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 11,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T08:17:19.457Z",
+        "paid_course": 3,
+        "paid_lesson": null,
+        "amount": "300.00",
+        "payment_method": "stripe",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "succeeded"
     }
 },
 {
@@ -256,7 +373,8 @@
         "title": "Создаём проекты",
         "preview": "courses/previews/2025-06-30_14-31-50.png",
         "description": "Здесь научим создавать проекты  отталкиваясь от использованных фреймворка",
-        "course_user": 6
+        "course_user": 6,
+        "fixed_price": "500.00"
     }
 },
 {
@@ -266,7 +384,8 @@
         "title": "Python это просто",
         "preview": "courses/previews/2025-06-14_17-25-33.png",
         "description": "Здесь вы найдёте ответы на вопросы с разжёвыванием тем с разными ходовыми проектами, а также придумаете своё.",
-        "course_user": 7
+        "course_user": 7,
+        "fixed_price": "400.00"
     }
 },
 {
@@ -276,7 +395,8 @@
         "title": "Нейролингвистическое программирование",
         "preview": "courses/previews/2025-06-30_14-33-52.png",
         "description": "Здесь научимся разговаривать, чтобы нас услышали с первого раза.",
-        "course_user": 5
+        "course_user": 5,
+        "fixed_price": "300.00"
     }
 },
 {
@@ -286,7 +406,19 @@
         "title": "Составим  сами себе портфолио",
         "preview": "courses/previews/2025-06-30_14-38-57.png",
         "description": "Создадим себе портфолию, от которого шансы на трудоустройства возрастут на 120%",
-        "course_user": 4
+        "course_user": 4,
+        "fixed_price": "200.00"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 5,
+    "fields": {
+        "title": "ЗОЖ",
+        "preview": "courses/previews/2025-07-20_14-34-16_xqmRz1E.png",
+        "description": "Всё о здоровом смысле жизни.",
+        "course_user": 2,
+        "fixed_price": "11999.00"
     }
 },
 {
@@ -298,6 +430,7 @@
         "description": "Создадим с нуля своё портфолио.",
         "preview": "lessons/previews/2025-06-30_14-55-08.png",
         "video_link": "https://www.youtube.com/watch?v=youtube1",
+        "price": "300.00",
         "lesson_user": null
     }
 },
@@ -310,6 +443,7 @@
         "description": "Определим темпераменты людей.",
         "preview": "lessons/previews/2025-06-30_14-52-58.png",
         "video_link": "https://www.youtube.com/watch?v=youtube2",
+        "price": "5.00",
         "lesson_user": null
     }
 },
@@ -322,6 +456,7 @@
         "description": "1. Разберём проект полностью. \r\n2. Выявим всё, что используется и для чего.\r\n3. Выявим лучшие стороны.\r\n4. Выявим недочёты и не правильную логику.\r\n5. Подправим необход...",
         "preview": "lessons/previews/2025-06-30_14-50-57.png",
         "video_link": "https://www.youtube.com/watch?v=youtube3",
+        "price": "200.00",
         "lesson_user": null
     }
 },
@@ -334,7 +469,34 @@
         "description": "Краткое содержание. Создаём алгоритм. Рисуем себе схему. Делаем программу, что можно было получить с того или иного алгоритма.",
         "preview": "lessons/previews/2025-06-30_14-44-19.png",
         "video_link": "https://www.youtube.com/watch?v=youtube4",
-        "lesson_user": null
+        "price": "200.00",
+        "lesson_user": 9
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 5,
+    "fields": {
+        "course": 5,
+        "title": "Здоровая еда",
+        "description": "Подбираем еду в свой рацион по своим возможностям и без вреда для здоровья и кошелька",
+        "preview": "lessons/previews/2025-07-20_14-38-47_OHmtJVk.png",
+        "video_link": "https://www.youtube.com/channel/1",
+        "price": "7000.00",
+        "lesson_user": 2
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 6,
+    "fields": {
+        "course": 5,
+        "title": "Водный баланс",
+        "description": "Создаём правильный водно-электролитный баланс для своего здоровья",
+        "preview": "lessons/previews/2025-07-20_14-42-16.png",
+        "video_link": "https://www.youtube.com/channel/2",
+        "price": "7000.00",
+        "lesson_user": 2
     }
 }
 ]
