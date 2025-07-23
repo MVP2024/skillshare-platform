@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$1000000$kuly5VPJaDszJcrSGupu6J$FFKRleK3LG1pfCoBox09jQlbGnXDaY/fVNjibowYQW8=",
-        "last_login": null,
+        "last_login": "2025-06-20T16:52:49.977Z",
         "is_superuser": false,
         "first_name": "Андрей",
         "last_name": "Болтырёв",
@@ -24,7 +24,7 @@
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$1000000$oEU2QhADlXHI7qVpB6m6z5$i/tHAfJ7mc+1KC7gauLwq0qW1f2r3e64QfG52l21gUE=",
-        "last_login": "2025-07-21T08:03:51.257Z",
+        "last_login": "2025-07-21T15:30:07.650Z",
         "is_superuser": false,
         "first_name": "Елена",
         "last_name": "Красивая",
@@ -374,7 +374,8 @@
         "preview": "courses/previews/2025-06-30_14-31-50.png",
         "description": "Здесь научим создавать проекты  отталкиваясь от использованных фреймворка",
         "course_user": 6,
-        "fixed_price": "500.00"
+        "fixed_price": "500.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
     }
 },
 {
@@ -385,7 +386,8 @@
         "preview": "courses/previews/2025-06-14_17-25-33.png",
         "description": "Здесь вы найдёте ответы на вопросы с разжёвыванием тем с разными ходовыми проектами, а также придумаете своё.",
         "course_user": 7,
-        "fixed_price": "400.00"
+        "fixed_price": "400.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
     }
 },
 {
@@ -396,7 +398,8 @@
         "preview": "courses/previews/2025-06-30_14-33-52.png",
         "description": "Здесь научимся разговаривать, чтобы нас услышали с первого раза.",
         "course_user": 5,
-        "fixed_price": "300.00"
+        "fixed_price": "300.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
     }
 },
 {
@@ -407,7 +410,8 @@
         "preview": "courses/previews/2025-06-30_14-38-57.png",
         "description": "Создадим себе портфолию, от которого шансы на трудоустройства возрастут на 120%",
         "course_user": 4,
-        "fixed_price": "200.00"
+        "fixed_price": "200.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
     }
 },
 {
@@ -418,7 +422,8 @@
         "preview": "courses/previews/2025-07-20_14-34-16_xqmRz1E.png",
         "description": "Всё о здоровом смысле жизни.",
         "course_user": 2,
-        "fixed_price": "11999.00"
+        "fixed_price": "11999.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
     }
 },
 {

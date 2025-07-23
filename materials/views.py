@@ -1,3 +1,5 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
@@ -8,6 +10,7 @@ from rest_framework.views import APIView
 from materials.models import Course, CourseSubscription, Lesson
 from materials.paginators import MaterialsPagination
 from materials.serializers import CourseSerializer, LessonSerializer
+from materials.tasks import send_course_update_notification
 from users.permissions import (IsNotModerator, IsOwnerOrModerator,
                                IsOwnerOrSuperuser)
 
@@ -64,6 +67,29 @@ class CourseViewSet(viewsets.ModelViewSet):
         При создании курса автоматически привязываем его к текущему авторизованному пользователю.
         """
         serializer.save(course_user=self.request.user)
+
+    def perform_update(self, serializer):
+        """
+        При обновлении курса, сохраняет изменения и проверяет,
+        нужно ли отправить уведомление подписчикам.
+        Уведомление отправляется, если с момента последнего уведомления курса
+        прошло более четырех часов.
+        """
+        instance = self.get_object()  # Получаем текущий объект до обновления
+        super().perform_update(
+            serializer)  # Сохраняем обновленные данные. updated_at обновится автоматически благодаря auto_now=True
+
+        # Проверяем, прошло ли достаточно времени с последнего уведомления.
+        # Если updated_at None (впервые обновляется курс) или прошло более 4 часов
+        if (
+                instance.updated_at is None
+                or (timezone.now() - instance.updated_at) >= timedelta(hours=4)
+        ):
+            # Запускаем асинхронную задачу для отправки уведомлений
+            send_course_update_notification.delay(instance.id)
+            # Поскольку updated_at имеет auto_now=True, оно уже обновилось при super().perform_update(serializer).
+            # Дополнительное сохранение не требуется, если только мы не хотим принудительно установить время.
+            # Но для логики "с момента последнего уведомления" auto_now=True подходит хорошо.
 
     @extend_schema(
         summary="Создание курса",
@@ -232,6 +258,31 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
 
+    def perform_update(self, serializer):
+        """
+        При обновлении урока, сохраняет изменения, а затем проверяет,
+        нужно ли отправить уведомление подписчикам курса, к которому принадлежит урок.
+        Уведомление отправляется, если с момента последнего уведомления курса
+        прошло более четырех часов.
+        """
+        instance = self.get_object()  # Получаем текущий экземпляр урока до обновления
+        course_of_lesson = instance.course  # Получаем курс, связанный с этим уроком
+
+        super().perform_update(serializer)  # Сохраняем обновленные данные урока
+
+        # Проверяем, прошло ли достаточно времени с последнего уведомления для КУРСА.
+        # Если updated_at None (впервые обновляется курс) или прошло более 4 часов
+        if (
+                course_of_lesson.updated_at is None
+                or (timezone.now() - course_of_lesson.updated_at) >= timedelta(hours=4)
+        ):
+            # Запускаем асинхронную задачу для отправки уведомлений по КУРСУ
+            send_course_update_notification.delay(course_of_lesson.id)
+
+            # Обновляем поле updated_at курса, чтобы сбросить таймер для этого курса.
+            # Поскольку updated_at в модели Course имеет auto_now=True, достаточно просто сохранить объект Course,
+            # чтобы это поле обновилось до текущего времени.
+            course_of_lesson.save()
 
 class CourseSubscriptionView(APIView):
     """

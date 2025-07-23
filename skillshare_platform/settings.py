@@ -89,7 +89,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "ru-ru"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
@@ -145,5 +145,63 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Documentation for SkillShare Platform API endpoints',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    # Pltcm настройки могут быть добавлены здесь по мере необходимости
+    # Здесь настройки могут быть добавлены здесь по мере необходимости
 }
+
+# Настройки Celery
+
+# URL брокера сообщений. Redis используется как брокер для передачи задач.
+# Здесь используются переменные окружения для получения хоста, порта и базы данных Redis.
+CELERY_BROKER_URL = f"redis://{os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6379')}/{os.getenv('REDIS_DB', '0')}"
+
+# Бэкенд для хранения результатов выполнения задач. Также используем Redis.
+# Это позволяет получать результаты задач по их ID.
+CELERY_RESULT_BACKEND = f"redis://{os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6379')}/{os.getenv('REDIS_DB', '0')}"
+
+# Допустимые типы контента для сообщений. JSON является безопасным и рекомендуемым.
+CELERY_ACCEPT_CONTENT = ["json"]
+
+# Сериализатор для задач. Определяет, как задачи будут сериализованы при отправке брокеру.
+CELERY_TASK_SERIALIZER = "json"
+
+# Сериализатор для результатов задач. Определяет, как результаты будут сериализованы при хранении.
+CELERY_RESULT_SERIALIZER = "json"
+
+# Часовой пояс для задач, особенно важно для Celery Beat.
+CELERY_TIMEZONE = "Europe/Moscow" # Используем UTC, чтобы избежать проблем с часовыми поясами
+
+# Настройки Celery Beat для периодических задач.
+# Это словарь, где ключи - это имена задач, а значения - их расписание.
+CELERY_BEAT_SCHEDULE = {
+    "debug_every_minute": {
+        "task": "skillshare_platform.celery.debug_task", # Полный путь к задаче
+        "schedule": timedelta(minutes=1), # Запускать задачу каждую минуту
+        "args": (), # Аргументы, передаваемые задаче
+        "kwargs": {}, # Именованные аргументы, передаваемые задаче
+        "options": {"queue": "celery"}, # Опционально: указать очередь, в которую будет отправлена задача
+        "name": "Отладочная задача каждую минуту", # имя для админки Celery Beat
+        "relative": False, # Относительно времени запуска Beat
+    },
+    "deactivate_inactive_users_daily": {
+        "task": "materials.tasks.deactivate_inactive_users", # Полный путь к новой задаче
+        "schedule": timedelta(days=30), # Запускать задачу раз в день
+        "options": {"queue": "celery"},
+        "name": "Деактивация неактивных пользователей",
+    },
+    # Здесь можно добавлять другие периодические задачи
+}
+
+# Настройки Email
+# EMAIL_BACKEND по умолчанию устанавливается в console.EmailBackend для разработки.
+# Для использования реальной отправки через SMTP, установите EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+# в вашем .env файле.
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "webmaster@localhost")
