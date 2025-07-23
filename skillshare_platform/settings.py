@@ -1,23 +1,21 @@
+import os
+from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-0eh#vwk0%3h+92pzuyti07u%&is)(1p5bah$*mus#f4^_z_b@7"
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
+# Добавьте ваш базовый URL
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000") # добавлен для тестирования
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -26,12 +24,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "users",
-    # "education",
+    "users",
+    "materials",
     "rest_framework",
+    "django_filters",
+    "rest_framework_simplejwt",
+    "drf_spectacular",
 ]
-
-# AUTH_USER_MODEL = "users.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -62,20 +61,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "skillshare_platform.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -92,25 +87,121 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "ru-ru"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = "static/"
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+MEDIA_URL = "media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "users.User"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_ENABLED": False,
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    "JTI_CLAIM": "jti",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SkillShare Platform API',
+    'DESCRIPTION': 'Documentation for SkillShare Platform API endpoints',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # Здесь настройки могут быть добавлены здесь по мере необходимости
+}
+
+# Настройки Celery
+
+# URL брокера сообщений. Redis используется как брокер для передачи задач.
+# Здесь используются переменные окружения для получения хоста, порта и базы данных Redis.
+CELERY_BROKER_URL = f"redis://{os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6379')}/{os.getenv('REDIS_DB', '0')}"
+
+# Бэкенд для хранения результатов выполнения задач. Также используем Redis.
+# Это позволяет получать результаты задач по их ID.
+CELERY_RESULT_BACKEND = f"redis://{os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6379')}/{os.getenv('REDIS_DB', '0')}"
+
+# Допустимые типы контента для сообщений. JSON является безопасным и рекомендуемым.
+CELERY_ACCEPT_CONTENT = ["json"]
+
+# Сериализатор для задач. Определяет, как задачи будут сериализованы при отправке брокеру.
+CELERY_TASK_SERIALIZER = "json"
+
+# Сериализатор для результатов задач. Определяет, как результаты будут сериализованы при хранении.
+CELERY_RESULT_SERIALIZER = "json"
+
+# Часовой пояс для задач, особенно важно для Celery Beat.
+CELERY_TIMEZONE = "Europe/Moscow" # Используем UTC, чтобы избежать проблем с часовыми поясами
+
+# Настройки Celery Beat для периодических задач.
+# Это словарь, где ключи - это имена задач, а значения - их расписание.
+CELERY_BEAT_SCHEDULE = {
+    "debug_every_minute": {
+        "task": "skillshare_platform.celery.debug_task", # Полный путь к задаче
+        "schedule": timedelta(minutes=1), # Запускать задачу каждую минуту
+        "args": (), # Аргументы, передаваемые задаче
+        "kwargs": {}, # Именованные аргументы, передаваемые задаче
+        "options": {"queue": "celery"}, # Опционально: указать очередь, в которую будет отправлена задача
+        "name": "Отладочная задача каждую минуту", # имя для админки Celery Beat
+        "relative": False, # Относительно времени запуска Beat
+    },
+    "deactivate_inactive_users_daily": {
+        "task": "materials.tasks.deactivate_inactive_users", # Полный путь к новой задаче
+        "schedule": timedelta(days=30), # Запускать задачу раз в день
+        "options": {"queue": "celery"},
+        "name": "Деактивация неактивных пользователей",
+    },
+    # Здесь можно добавлять другие периодические задачи
+}
+
+# Настройки Email
+# EMAIL_BACKEND по умолчанию устанавливается в console.EmailBackend для разработки.
+# Для использования реальной отправки через SMTP, установите EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+# в вашем .env файле.
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "webmaster@localhost")

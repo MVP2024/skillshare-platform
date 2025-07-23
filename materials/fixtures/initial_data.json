@@ -1,0 +1,507 @@
+[
+{
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$kuly5VPJaDszJcrSGupu6J$FFKRleK3LG1pfCoBox09jQlbGnXDaY/fVNjibowYQW8=",
+        "last_login": "2025-06-20T16:52:49.977Z",
+        "is_superuser": false,
+        "first_name": "Андрей",
+        "last_name": "Болтырёв",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-29T20:10:36Z",
+        "email": "user2@a.com",
+        "phone": "+79999999999",
+        "city": "Одинцово",
+        "avatar": "users/avatars_users/guest.gif",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$oEU2QhADlXHI7qVpB6m6z5$i/tHAfJ7mc+1KC7gauLwq0qW1f2r3e64QfG52l21gUE=",
+        "last_login": "2025-07-21T15:30:07.650Z",
+        "is_superuser": false,
+        "first_name": "Елена",
+        "last_name": "Красивая",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T10:55:44Z",
+        "email": "user4@a.com",
+        "phone": "+79999999999",
+        "city": "Брянск",
+        "avatar": "users/avatars_users/2025-06-30_13-49-04.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$UcB2mvwp79j8SI3sjjhqSz$5GDTfrNFOBy5w+DySbSBdbz9ShzOt/1fG9/H4CwG2/Q=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Наталья",
+        "last_name": "Алексеева",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T10:57:58Z",
+        "email": "user8@a.com",
+        "phone": "+79999999999",
+        "city": "Меркурий",
+        "avatar": "users/avatars_users/2025-06-30_13-49-04_itK6UEQ.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$f0dh856JOUm3wHTfhEgpqk$kY9V+SHQQnhjM5UdleyhAXD0OzgArtbSDctzjIqSECw=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Александр",
+        "last_name": "Медведев",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T10:59:09Z",
+        "email": "user7@a.com",
+        "phone": "+79999999901",
+        "city": "Ейск",
+        "avatar": "users/avatars_users/2025-06-30_13-49-04_985WUhg.png",
+        "groups": [
+            1
+        ],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$tnCaPjx2jVr0wA1qjVPZLD$ey/xqqlIqBl1jyTS7Gwzz4yWw7sBfAcyBzhUoVpXtz4=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Ирина",
+        "last_name": "Полено",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:00:08Z",
+        "email": "user6@a.com",
+        "phone": "+79999999902",
+        "city": "Тверь",
+        "avatar": "users/avatars_users/Земля.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 6,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$E0AhdqUEk3J3ed0gjfsIkE$MpYeVjYe/NdnqwpZ52rjcsooR/uRil+WyQNU8abOcgc=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Ольга",
+        "last_name": "Широкая",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:01:18Z",
+        "email": "user5@a.com",
+        "phone": "+79999999903",
+        "city": "Самара",
+        "avatar": "users/avatars_users/2025-06-30_14-00-57.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 7,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$nXnp7IAxCqtOv1ryx6RtUe$L5Di9gTQDIbELBq2ZnMjELCdGZOozchx+6NA1AIoUWI=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Виктор",
+        "last_name": "Цыбуля",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:02:20Z",
+        "email": "user3@a.com",
+        "phone": "+79999999904",
+        "city": "Москва",
+        "avatar": "users/avatars_users/2025-06-30_14-01-56.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 8,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$iPDEZ48wDlfP18pAbWvEIF$gOvYA9IjMLd/FgQaVijXv0/viDIhZmHu5WKBiDJOwu0=",
+        "last_login": "2025-07-21T07:39:13.474Z",
+        "is_superuser": true,
+        "first_name": "Хозяин",
+        "last_name": "Леса",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2025-06-30T11:19:59Z",
+        "email": "walery.medvedev@gmail.com",
+        "phone": "+70000000000",
+        "city": "Одинцово",
+        "avatar": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 9,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$y9hCBNrMgXcaTVUpsdLf0B$0QFMPNbsAk0QYVQH1VWCZy244XdxrxZMK6uuWO3roNI=",
+        "last_login": "2025-07-01T15:09:35.182Z",
+        "is_superuser": false,
+        "first_name": "Максим",
+        "last_name": "Перепелица",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-07-01T14:54:49Z",
+        "email": "user1@a.com",
+        "phone": "+79999999995",
+        "city": "Москва",
+        "avatar": "users/avatars_users/2025-06-14_17-25-33.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 10,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$aDHAdpG7xAgy2XZFZIs48f$Xy86PjvjK4KoizBgFXmCfe7C1a+MjnIPhPnEOxKNv6c=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Анастасия",
+        "last_name": "Великая",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-07-01T15:20:40.605Z",
+        "email": "",
+        "phone": null,
+        "city": null,
+        "avatar": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 1,
+    "fields": {
+        "user": 1,
+        "payment_date": "2025-06-30T11:56:14.840Z",
+        "paid_course": 2,
+        "paid_lesson": null,
+        "amount": "200.00",
+        "payment_method": "make_qr_code",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 2,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-06-30T11:56:36.416Z",
+        "paid_course": null,
+        "paid_lesson": 3,
+        "amount": "200.00",
+        "payment_method": "transfer",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 3,
+    "fields": {
+        "user": 3,
+        "payment_date": "2025-06-30T11:56:52.754Z",
+        "paid_course": 3,
+        "paid_lesson": null,
+        "amount": "500.00",
+        "payment_method": "make_qr_code",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 4,
+    "fields": {
+        "user": 8,
+        "payment_date": "2025-06-30T11:57:27.897Z",
+        "paid_course": 4,
+        "paid_lesson": null,
+        "amount": "100.00",
+        "payment_method": "cash",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 5,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:49:29.611Z",
+        "paid_course": null,
+        "paid_lesson": 5,
+        "amount": "2000.00",
+        "payment_method": "stripe",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "succeeded"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 6,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:53:10.869Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "4000.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a18SM9Sn9whXj0gmrnDag4MY1ZF07qiQxPJSDy2NAgqyFvim8VbnwLUnxo",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a18SM9Sn9whXj0gmrnDag4MY1ZF07qiQxPJSDy2NAgqyFvim8VbnwLUnxo#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 7,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:53:45.773Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "0.00",
+        "payment_method": "free",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "succeeded"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 8,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T07:54:40.100Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "11999.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a1nn3KIGJZ8l4YB7v7WEslKLi6s9bqJ0zrX88FsZaTzl0ylJtDB3Pm69Qm",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a1nn3KIGJZ8l4YB7v7WEslKLi6s9bqJ0zrX88FsZaTzl0ylJtDB3Pm69Qm#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 9,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T08:00:04.782Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "11999.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a1FxggkhQkJzUQdOsZlOPBb9QZAY5qeISlLJSMjTKpDWJx9XNSDsXR4geY",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a1FxggkhQkJzUQdOsZlOPBb9QZAY5qeISlLJSMjTKpDWJx9XNSDsXR4geY#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 10,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T08:04:11.693Z",
+        "paid_course": 5,
+        "paid_lesson": null,
+        "amount": "11999.00",
+        "payment_method": "stripe",
+        "stripe_id": "cs_test_a1rwJYI8CBlGxB3jrNyM18aYekbBLVmGc1n1SWWVpUusbEgSr4mDZGx7kQ",
+        "payment_url": "https://checkout.stripe.com/c/pay/cs_test_a1rwJYI8CBlGxB3jrNyM18aYekbBLVmGc1n1SWWVpUusbEgSr4mDZGx7kQ#fidkdWxOYHwnPyd1blpxYHZxWjA0V2hxS0xEQkdGUGd%2FVmtqYHBRSWlXSUczYXBsXE99dE1vSHY3UDZjbn1yfW5LfG4wYV01cE1rPVRIZ3dSa30xc21ta2ZQRjFSdjV1YDI3MUhEYUM0VmB9NTVrSlxGc0QwSCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "status": "pending"
+    }
+},
+{
+    "model": "users.payment",
+    "pk": 11,
+    "fields": {
+        "user": 2,
+        "payment_date": "2025-07-21T08:17:19.457Z",
+        "paid_course": 3,
+        "paid_lesson": null,
+        "amount": "300.00",
+        "payment_method": "stripe",
+        "stripe_id": null,
+        "payment_url": null,
+        "status": "succeeded"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 1,
+    "fields": {
+        "title": "Создаём проекты",
+        "preview": "courses/previews/2025-06-30_14-31-50.png",
+        "description": "Здесь научим создавать проекты  отталкиваясь от использованных фреймворка",
+        "course_user": 6,
+        "fixed_price": "500.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 2,
+    "fields": {
+        "title": "Python это просто",
+        "preview": "courses/previews/2025-06-14_17-25-33.png",
+        "description": "Здесь вы найдёте ответы на вопросы с разжёвыванием тем с разными ходовыми проектами, а также придумаете своё.",
+        "course_user": 7,
+        "fixed_price": "400.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 3,
+    "fields": {
+        "title": "Нейролингвистическое программирование",
+        "preview": "courses/previews/2025-06-30_14-33-52.png",
+        "description": "Здесь научимся разговаривать, чтобы нас услышали с первого раза.",
+        "course_user": 5,
+        "fixed_price": "300.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 4,
+    "fields": {
+        "title": "Составим  сами себе портфолио",
+        "preview": "courses/previews/2025-06-30_14-38-57.png",
+        "description": "Создадим себе портфолию, от которого шансы на трудоустройства возрастут на 120%",
+        "course_user": 4,
+        "fixed_price": "200.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
+    }
+},
+{
+    "model": "materials.course",
+    "pk": 5,
+    "fields": {
+        "title": "ЗОЖ",
+        "preview": "courses/previews/2025-07-20_14-34-16_xqmRz1E.png",
+        "description": "Всё о здоровом смысле жизни.",
+        "course_user": 2,
+        "fixed_price": "11999.00",
+        "updated_at": "2025-07-21T15:50:48.493Z"
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 1,
+    "fields": {
+        "course": 4,
+        "title": "Портфолио это просто",
+        "description": "Создадим с нуля своё портфолио.",
+        "preview": "lessons/previews/2025-06-30_14-55-08.png",
+        "video_link": "https://www.youtube.com/watch?v=youtube1",
+        "price": "300.00",
+        "lesson_user": null
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 2,
+    "fields": {
+        "course": 3,
+        "title": "Урок 1. Вводная часть.",
+        "description": "Определим темпераменты людей.",
+        "preview": "lessons/previews/2025-06-30_14-52-58.png",
+        "video_link": "https://www.youtube.com/watch?v=youtube2",
+        "price": "5.00",
+        "lesson_user": null
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 3,
+    "fields": {
+        "course": 1,
+        "title": "Проект 1. Улучшаем поиск и сортировку товаров по критериям в яндекс-маркет",
+        "description": "1. Разберём проект полностью. \r\n2. Выявим всё, что используется и для чего.\r\n3. Выявим лучшие стороны.\r\n4. Выявим недочёты и не правильную логику.\r\n5. Подправим необход...",
+        "preview": "lessons/previews/2025-06-30_14-50-57.png",
+        "video_link": "https://www.youtube.com/watch?v=youtube3",
+        "price": "200.00",
+        "lesson_user": null
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 4,
+    "fields": {
+        "course": 2,
+        "title": "Урок 1. Что такое Python? Его нюансы.",
+        "description": "Краткое содержание. Создаём алгоритм. Рисуем себе схему. Делаем программу, что можно было получить с того или иного алгоритма.",
+        "preview": "lessons/previews/2025-06-30_14-44-19.png",
+        "video_link": "https://www.youtube.com/watch?v=youtube4",
+        "price": "200.00",
+        "lesson_user": 9
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 5,
+    "fields": {
+        "course": 5,
+        "title": "Здоровая еда",
+        "description": "Подбираем еду в свой рацион по своим возможностям и без вреда для здоровья и кошелька",
+        "preview": "lessons/previews/2025-07-20_14-38-47_OHmtJVk.png",
+        "video_link": "https://www.youtube.com/channel/1",
+        "price": "7000.00",
+        "lesson_user": 2
+    }
+},
+{
+    "model": "materials.lesson",
+    "pk": 6,
+    "fields": {
+        "course": 5,
+        "title": "Водный баланс",
+        "description": "Создаём правильный водно-электролитный баланс для своего здоровья",
+        "preview": "lessons/previews/2025-07-20_14-42-16.png",
+        "video_link": "https://www.youtube.com/channel/2",
+        "price": "7000.00",
+        "lesson_user": 2
+    }
+}
+]
