@@ -207,3 +207,4 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "webmaster@localhost")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
