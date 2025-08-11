@@ -246,7 +246,7 @@ class PaymentCreateAPIView(generics.CreateAPIView):
                 "amount": payment_info["amount"],
                 "status": payment_info["status"],
             }, status=status.HTTP_200_OK)
-        except (ValueError, Exception) as e:
+        except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -257,6 +257,7 @@ class StripeSuccessView(APIView):
     Извлекает сессию Stripe, обновляет локальный статус Payment на 'succeeded'.
     """
     permission_classes = []
+    serializer_class = None
 
     @extend_schema(
         summary="Обработка успешной оплаты Stripe",
@@ -327,6 +328,7 @@ class StripeCancelView(APIView):
     Обновляет локальный статус Payment на 'failed', если он был 'pending'.
     """
     permission_classes = []  # Аутентификация не требуется для колбэков Stripe
+    serializer_class = None
 
     def get(self, request, *args, **kwargs):
         session_id = request.GET.get('session_id')  # Stripe часто отправляет session_id и сюда
@@ -344,6 +346,5 @@ class StripeCancelView(APIView):
             except (stripe.error.InvalidRequestError, Exception) as e:
                 # Зарегистрируйте ошибку, но все равно верните сообщение об отмене пользователю/Stripe
                 print(f"Ошибка обработки колбэка отмены Stripe для сессии {session_id}: {e}")
-                pass
 
         return Response({"message": "Платеж отменен пользователем."}, status=status.HTTP_200_OK)

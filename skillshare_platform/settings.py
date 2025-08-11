@@ -12,10 +12,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Добавьте ваш базовый URL
-BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000") # добавлен для тестирования
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")  # добавлен для тестирования
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -110,8 +110,10 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",
+                                "rest_framework.filters.OrderingFilter",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+
 }
 
 SIMPLE_JWT = {
@@ -168,23 +170,23 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
 # Часовой пояс для задач, особенно важно для Celery Beat.
-CELERY_TIMEZONE = "Europe/Moscow" # Используем UTC, чтобы избежать проблем с часовыми поясами
+CELERY_TIMEZONE = "Europe/Moscow"  # Используем UTC, чтобы избежать проблем с часовыми поясами
 
 # Настройки Celery Beat для периодических задач.
 # Это словарь, где ключи - это имена задач, а значения - их расписание.
 CELERY_BEAT_SCHEDULE = {
     "debug_every_minute": {
-        "task": "skillshare_platform.celery.debug_task", # Полный путь к задаче
-        "schedule": timedelta(minutes=1), # Запускать задачу каждую минуту
-        "args": (), # Аргументы, передаваемые задаче
-        "kwargs": {}, # Именованные аргументы, передаваемые задаче
-        "options": {"queue": "celery"}, # Опционально: указать очередь, в которую будет отправлена задача
-        "name": "Отладочная задача каждую минуту", # имя для админки Celery Beat
-        "relative": False, # Относительно времени запуска Beat
+        "task": "skillshare_platform.celery.debug_task",  # Полный путь к задаче
+        "schedule": timedelta(minutes=1),  # Запускать задачу каждую минуту
+        "args": (),  # Аргументы, передаваемые задаче
+        "kwargs": {},  # Именованные аргументы, передаваемые задаче
+        "options": {"queue": "celery"},  # Опционально: указать очередь, в которую будет отправлена задача
+        "name": "Отладочная задача каждую минуту",  # имя для админки Celery Beat
+        "relative": False,  # Относительно времени запуска Beat
     },
     "deactivate_inactive_users_daily": {
-        "task": "materials.tasks.deactivate_inactive_users", # Полный путь к новой задаче
-        "schedule": timedelta(days=30), # Запускать задачу раз в день
+        "task": "materials.tasks.deactivate_inactive_users",  # Полный путь к новой задаче
+        "schedule": timedelta(days=30),  # Запускать задачу раз в день
         "options": {"queue": "celery"},
         "name": "Деактивация неактивных пользователей",
     },
@@ -205,3 +207,4 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "webmaster@localhost")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
