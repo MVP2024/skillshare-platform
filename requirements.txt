@@ -20,6 +20,7 @@ djangorestframework_simplejwt==5.4.0
 drf-spectacular==0.28.0
 drf-spectacular-sidecar==2025.7.1
 flake8==7.3.0
+gunicorn==23.0.0
 idna==3.10
 inflection==0.5.1
 iniconfig==2.1.0
@@ -60,5 +61,3 @@ uritemplate==4.2.0
 urllib3==2.5.0
 vine==5.1.0
 wcwidth==0.2.13
-gunicorn==23.0.0
-psycopg2-binary==2.9.10
