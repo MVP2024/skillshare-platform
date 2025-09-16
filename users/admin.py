@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from users.models import User, Payment
+from users.models import Payment, User
 
 
 class CustomUserAdmin(UserAdmin):
@@ -34,7 +34,7 @@ class CustomUserAdmin(UserAdmin):
 
     # Переопределяем fieldsets для страницы изменения пользователя
     fieldsets = (
-        (None, {"fields": ("email", "password")} ),
+        (None, {"fields": ("email", "password")}),
         (
             "Personal info",
             {"fields": ("first_name", "last_name", "phone", "city", "avatar")},

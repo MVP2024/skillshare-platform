@@ -6,6 +6,10 @@ on:
       - develop
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint_and_tests:
     name: Lint and Tests
@@ -101,22 +105,24 @@ jobs:
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          port: ${{ secrets.SERVER_PORT }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
+            # branch name passed from workflow
+            export GITHUB_REF_NAME="${{ github.ref_name }}"
             export DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}
-            echo "Deploying to $DEPLOY_PATH"
+            echo "Deploying branch $GITHUB_REF_NAME to $DEPLOY_PATH"
             if [ ! -d "$DEPLOY_PATH" ]; then
               mkdir -p "$DEPLOY_PATH"
               git clone https://github.com/${{ github.repository }} "$DEPLOY_PATH"
             fi
             cd "$DEPLOY_PATH"
             git fetch --all
-            git checkout $GITHUB_REF_NAME || git checkout -B $GITHUB_REF_NAME origin/$GITHUB_REF_NAME
-            git reset --hard origin/$GITHUB_REF_NAME
+            git checkout "$GITHUB_REF_NAME" || git checkout -B "$GITHUB_REF_NAME" origin/"$GITHUB_REF_NAME"
+            git reset --hard origin/"$GITHUB_REF_NAME"
             # ensure .env exists
             if [ ! -f .env ]; then
               echo ".env not found in $DEPLOY_PATH. Please create it from .env.example and add production values." >&2

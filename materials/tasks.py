@@ -2,8 +2,8 @@ import datetime
 import logging
 
 from celery import shared_task
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
 from django.utils import timezone
 
 from materials.models import Course, CourseSubscription
@@ -28,7 +28,8 @@ def send_course_update_notification(course_id: int):
 
         if not subscriptions.exists():
             logger.info(
-                f"Нет активных подписчиков на курс '{course.title}' (ID: {course_id}). Уведомления не отправлены.")
+                f"Нет активных подписчиков на курс '{course.title}' (ID: {course_id}). Уведомления не отправлены."
+            )
             return
 
         subject = f"Обновление курса: '{course.title}'"
@@ -43,20 +44,30 @@ def send_course_update_notification(course_id: int):
         recipient_list = [sub.user.email for sub in subscriptions if sub.user.email]
 
         if not recipient_list:
-            logger.warning(f"На курсе '{course.title}' (ID: {course_id}) нет подписчиков с валидными email-адресами.")
+            logger.warning(
+                f"На курсе '{course.title}' (ID: {course_id}) нет подписчиков с валидными email-адресами."
+            )
             return
 
         logger.info(
-            f"Отправка уведомлений об обновлении курса '{course.title}' (ID: {course_id}) для {len(recipient_list)} подписчиков...")
+            f"Отправка уведомлений об обновлении курса '{course.title}' (ID: {course_id}) для {len(recipient_list)} подписчиков..."
+        )
 
         send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
-        logger.info(f"Уведомления об обновлении курса '{course.title}' (ID: {course_id}) успешно отправлены.")
+        logger.info(
+            f"Уведомления об обновлении курса '{course.title}' (ID: {course_id}) успешно отправлены."
+        )
 
     except Course.DoesNotExist:
-        logger.error(f"Курс с ID {course_id} не найден. Невозможно отправить уведомление.")
+        logger.error(
+            f"Курс с ID {course_id} не найден. Невозможно отправить уведомление."
+        )
     except Exception as e:
-        logger.error(f"Ошибка при отправке уведомлений для курса ID {course_id}: {e}", exc_info=True)
+        logger.error(
+            f"Ошибка при отправке уведомлений для курса ID {course_id}: {e}",
+            exc_info=True,
+        )
 
 
 @shared_task
@@ -78,9 +89,7 @@ def deactivate_inactive_users():
     # и их последний вход был раньше, чем месяц назад.
     # Исключаем суперпользователей, чтобы случайно не заблокировать администраторов.
     inactive_users = User.objects.filter(
-        is_active=True,
-        is_superuser=False,
-        last_login__lt=month_ago
+        is_active=True, is_superuser=False, last_login__lt=month_ago
     )
 
     if inactive_users.exists():
@@ -114,11 +123,16 @@ def deactivate_inactive_users():
                         message,
                         from_email,
                         [email],  # Передаем адрес как список из одного элемента
-                        fail_silently=False
+                        fail_silently=False,
                     )
-                logger.info(f"Уведомления о деактивации отправлены для {len(deactivated_user_emails)} пользователей.")
+                logger.info(
+                    f"Уведомления о деактивации отправлены для {len(deactivated_user_emails)} пользователей."
+                )
             except Exception as e:
-                logger.error(f"Ошибка при отправке уведомлений о деактивации пользователей: {e}", exc_info=True)
+                logger.error(
+                    f"Ошибка при отправке уведомлений о деактивации пользователей: {e}",
+                    exc_info=True,
+                )
         else:
             logger.info("Нет email-адресов для отправки уведомлений о деактивации.")
     else:
