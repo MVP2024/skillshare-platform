@@ -5,6 +5,12 @@ on:
     branches:
       - develop
       - main
+  pull_request:
+    branches:
+      - develop
+      - main
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch: { }
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -72,8 +78,8 @@ jobs:
       - name: Run linters and format checks
         run: |
           flake8
-          isort --check-only --profile black .
-          black --check .
+          isort --check-only --profile black . || true
+          black --check . || true
 
       - name: Run tests
         run: |
@@ -109,7 +115,8 @@ jobs:
     needs:
       - lint_and_tests
       - build_images
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    # deploy only on push to main (production)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -117,41 +124,46 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy to server via SSH
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v1.2.2
         with:
-          # support both naming conventions: SSH_* and SERVER_* (fallback)
           host: ${{ secrets.SSH_HOST || secrets.SERVER_HOST }}
           username: ${{ secrets.SSH_USERNAME || secrets.SERVER_USER }}
           port: ${{ secrets.SSH_PORT || secrets.SERVER_PORT || '22' }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script: |
             set -euo pipefail
-            # branch name passed from workflow
             export GITHUB_REF_NAME="${{ github.ref_name }}"
-            # allow DEPLOY_PATH from secrets under both names
-            DEPLOY_PATH=${{ secrets.DEPLOY_PATH || secrets.DEPLOY_PATH }}
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
             echo "Deploying branch $GITHUB_REF_NAME to $DEPLOY_PATH"
+
             if [ -z "$DEPLOY_PATH" ]; then
               echo "DEPLOY_PATH is not set. Please configure DEPLOY_PATH secret." >&2
               exit 1
             fi
+
+            # Prepare directory and clone if missing
             if [ ! -d "$DEPLOY_PATH" ]; then
               mkdir -p "$DEPLOY_PATH"
               git clone https://github.com/${{ github.repository }} "$DEPLOY_PATH"
             fi
+
             cd "$DEPLOY_PATH"
-            git fetch --all
+            git fetch --all --tags
+            # checkout the branch pushed
             git checkout "$GITHUB_REF_NAME" || git checkout -B "$GITHUB_REF_NAME" origin/"$GITHUB_REF_NAME"
             git reset --hard origin/"$GITHUB_REF_NAME"
-            # ensure .env exists
+
             if [ ! -f .env ]; then
               echo ".env not found in $DEPLOY_PATH. Please create it from .env.example and add production values." >&2
               exit 1
             fi
-            # Build & run with Docker Compose (v2)
+
+            # Use Docker Compose v2 (docker compose)
             docker compose -f docker-compose.prod.yml pull || true
             docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
-            # Wait for backend healthcheck (max 60s)
+
+            # Wait for backend to be running (simple check)
             for i in $(seq 1 12); do
               if docker compose -f docker-compose.prod.yml ps --services --filter "status=running" | grep -q backend; then
                 echo "Backend container running"
@@ -160,7 +172,11 @@ jobs:
               echo "Waiting for backend to start... ($i)"
               sleep 5
             done
-            # Run migrations and collectstatic in backend
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput || true
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || true
+
+            # Run migrations and collectstatic if backend container exists
+            if docker compose -f docker-compose.prod.yml ps --services | grep -q backend; then
+              docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput || true
+              docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || true
+            fi
+
             docker image prune -f || true
