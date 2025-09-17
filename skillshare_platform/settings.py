@@ -10,14 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-# DEBUG should be explicitly set via environment variable in production
+# В рабочей среде DEBUG должен быть явно задан с помощью переменной среды
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# If SECRET_KEY is not provided, allow a safe fallback when running in CI/tests
-# (GitHub Actions sets GITHUB_ACTIONS=true). For non-debug production runs, require SECRET_KEY.
+# Если SECRET_KEY не указан, разрешите безопасный откат при запуске в CI/тестах
+# (GitHub Actions устанавливает GITHUB_ACTIONS=true). Для производственных запусков без отладки требуется SECRET_KEY.
 if not SECRET_KEY:
     if os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("CI") == "true" or os.getenv("PYTEST_CURRENT_TEST"):
-        # Use a non-secret fixed key in CI / test environments only
+        # Используйте несекретный фиксированный ключ только в средах CI / тестирования
         SECRET_KEY = "test-secret-key"
     elif not DEBUG:
         raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
@@ -180,7 +180,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# Email settings
+# Настройки Email
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
