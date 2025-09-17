@@ -9,10 +9,11 @@ from rest_framework.views import APIView
 
 from users.models import Payment, User
 from users.permissions import IsOwnerOrModerator
-from users.serializers import (PaymentCreateSerializer, PaymentSerializer,
-                               UserSerializer)
-from users.services import (process_payment_and_create_stripe_session,
-                            retrieve_stripe_session)
+from users.serializers import PaymentCreateSerializer, PaymentSerializer, UserSerializer
+from users.services import (
+    process_payment_and_create_stripe_session,
+    retrieve_stripe_session,
+)
 
 
 @extend_schema(tags=["Users"])

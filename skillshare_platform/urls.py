@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView
+
 # from rest_framework_simplejwt.views import (TokenObtainPairView,
 #                                             TokenRefreshView)
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from skillshare_platform.views import (CustomTokenObtainPairView,
-                                       CustomTokenRefreshView)
+from skillshare_platform.views import CustomTokenObtainPairView, CustomTokenRefreshView
 from users.views import StripeCancelView, StripeSuccessView
 
 urlpatterns = [
