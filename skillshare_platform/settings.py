@@ -13,16 +13,14 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # DEBUG should be explicitly set via environment variable in production
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# ALLOWED_HOSTS - comma separated list in env
-raw_allowed = os.getenv("ALLOWED_HOSTS", "*")
-ALLOWED_HOSTS = [h.strip() for h in raw_allowed.split(",") if h.strip()]
-
-# Base URL used by services like Stripe callbacks
-BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
-
-if not SECRET_KEY and not DEBUG:
-    raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
-
+# If SECRET_KEY is not provided, allow a safe fallback when running in CI/tests
+# (GitHub Actions sets GITHUB_ACTIONS=true). For non-debug production runs, require SECRET_KEY.
+if not SECRET_KEY:
+    if os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("CI") == "true" or os.getenv("PYTEST_CURRENT_TEST"):
+        # Use a non-secret fixed key in CI / test environments only
+        SECRET_KEY = "test-secret-key"
+    elif not DEBUG:
+        raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
