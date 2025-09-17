@@ -37,7 +37,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj) -> bool:
         """Проверяет подписку текущего пользователя на курс"""
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request and request.user.is_authenticated:
             return obj.subscribers.filter(user=request.user).exists()
         return False

@@ -64,7 +64,9 @@ class IsOwnerOrModerator(BasePermission):
         if request.user.is_superuser:
             return True
         if request.user.is_authenticated:
-            return IsOwner().has_object_permission(request, view, obj) or IsModerator().has_permission(request, view)
+            return IsOwner().has_object_permission(
+                request, view, obj
+            ) or IsModerator().has_permission(request, view)
         return False
 
 
@@ -72,6 +74,7 @@ class IsOwnerOrSuperuser(BasePermission):
     """
     Пользовательское разрешение, позволяющее владельцам или суперпользователям выполнять действие.
     """
+
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
             return True

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from users.models import Payment
+from users.models import Payment, User
 
 
 class CustomUserAdmin(UserAdmin):
@@ -11,7 +11,6 @@ class CustomUserAdmin(UserAdmin):
     """
 
     # Определяем поля, которые будут отображаться в списке пользователей
-    # Добавляем 'get_roles' как новую колонку
     list_display = (
         "email",
         "first_name",
@@ -56,12 +55,13 @@ class CustomUserAdmin(UserAdmin):
     )
 
     # Переопределяем add_fieldsets для страницы создания нового пользователя
+    # Для формы создания используются поля password1 и password2 (UserCreationForm)
     add_fieldsets = (
         (
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "password", "password2"),
+                "fields": ("email", "password1", "password2"),
             },
         ),
         (
@@ -109,5 +109,8 @@ class CustomUserAdmin(UserAdmin):
     get_roles.short_description = "Роли/Группы"
 
 
-# Регистрируем модель Payment (регистрация User теперь происходит в users/apps.py)
+# Регистрируем пользовательскую модель User с нашим CustomUserAdmin
+admin.site.register(User, CustomUserAdmin)
+
+# Регистрируем модель Payment
 admin.site.register(Payment)

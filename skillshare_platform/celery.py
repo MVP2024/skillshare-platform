@@ -1,4 +1,5 @@
 import os
+
 from celery import Celery
 
 # Устанавливаем переменную окружения по умолчанию для настроек Django.
@@ -13,6 +14,7 @@ app = Celery("skillshare_platform")
 # Это означает, что все настройки Celery будут браться из файла settings.py вашего Django проекта,
 # если они начинаются с префикса 'CELERY_'.
 app.config_from_object("django.conf:settings", namespace="CELERY")
+
 
 # Пример отладочной задачи для Celery (опционально, для проверки работы).
 # Эта задача просто выводит сообщение в консоль Celery worker'а.

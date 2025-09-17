@@ -166,3 +166,12 @@ cython_debug/
 
 # Docker
 #docker-compose.yaml
+
+# .gitignore
+# Python
+*.pyc
+*.pyo
+*.pyd
+.venv/
+
+celerybeat-schedule*

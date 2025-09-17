@@ -46,7 +46,9 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("Все фикстуры групп загружены."))
             else:
                 self.stdout.write(
-                    self.style.WARNING("Файлы фикстур групп не найдены в 'users/fixtures/'.")
+                    self.style.WARNING(
+                        "Файлы фикстур групп не найдены в 'users/fixtures/'."
+                    )
                 )
         else:
             self.stdout.write(
