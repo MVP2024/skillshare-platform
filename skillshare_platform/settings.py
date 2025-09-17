@@ -16,11 +16,15 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 # Если SECRET_KEY не указан, разрешите безопасный откат при запуске в CI/тестах
 # (GitHub Actions устанавливает GITHUB_ACTIONS=true). Для производственных запусков без отладки требуется SECRET_KEY.
 if not SECRET_KEY:
-    if os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("CI") == "true" or os.getenv("PYTEST_CURRENT_TEST"):
-        # Используйте несекретный фиксированный ключ только в средах CI / тестирования
+    gha = os.getenv("GITHUB_ACTIONS", "").lower()
+    ci_env = os.getenv("CI", "").lower()
+    pytest_cur = os.getenv("PYTEST_CURRENT_TEST")
+    if gha == "true" or ci_env == "true" or pytest_cur:
+        # Используем несекретный фиксированный ключ только в средах CI / тестирования
         SECRET_KEY = "test-secret-key"
     elif not DEBUG:
         raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

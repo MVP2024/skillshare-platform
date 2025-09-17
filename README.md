@@ -1,6 +1,6 @@
 # SkillShare Platform Backend
 
-Short, clear guide for developers and for a teacher who will review the project.
+Краткое и понятное руководство для разработчиков и преподавателя, который будет проверять проект.
 
 Badges: Django, DRF, Python, PostgreSQL, Docker
 
@@ -8,7 +8,8 @@ Badges: Django, DRF, Python, PostgreSQL, Docker
 
 ## Что в репозитории
 
-Это бэкенд на Django + Django REST Framework для учебной платформы (курсы, уроки, платежи, пользователи). Основные папки и файлы:
+Это бэкенд на Django + Django REST Framework для учебной платформы (курсы, уроки, платежи, пользователи). Основные папки
+и файлы:
 
 - `skillshare_platform/` — настройки Django, URL, wsgi/asgi, celery.
 - `users/` — приложение пользователей и платежей.
@@ -87,7 +88,8 @@ REDIS_PORT=6379
 docker-compose up -d --build
 ```
 
-После запуска сайт будет доступен по: http://localhost:8001/ (порт проброшен на 8001 в `docker-compose.yaml`). Документация API: http://localhost:8001/api/schema/swagger-ui/
+После запуска сайт будет доступен по: http://localhost:8001/ (порт проброшен на 8001 в `docker-compose.yaml`).
+Документация API: http://localhost:8001/api/schema/swagger-ui/
 
 6. Команды внутри контейнера (пример):
 
@@ -140,24 +142,28 @@ pytest --maxfail=1 --disable-warnings -q
 Workflow: `.github/workflows/ci-cd.yml`.
 
 Триггеры:
+
 - push в ветки `develop` и `main`
 - pull_request в `develop` и `main`
 - manual (workflow_dispatch)
 
 Jobs:
-- lint_and_tests:
-  - запускает контейнеры PostgreSQL и Redis как сервисы
-  - устанавливает зависимости
-  - запускает flake8, isort (check-only) и black (check)
-  - запускает pytest
-- build_images:
-  - зависит от lint_and_tests
-  - проверяет сборку docker-образа локально (не пушит)
-- deploy:
-  - выполняется только при push в ветку `main`
-  - использует SSH (appleboy/ssh-action) и выполняет деплой на удалённый сервер через docker compose prod
 
-Важно для ревьюера (учителя): в CI в job `lint_and_tests` в переменных окружения уже прописан `SECRET_KEY: test-secret-key` и `DEBUG: 'True'` — это сделано, чтобы тесты и импорт настроек работали в CI. Поэтому CI тесты не должны падать из-за отсутствия SECRET_KEY.
+- lint_and_tests:
+    - запускает контейнеры PostgreSQL и Redis как сервисы
+    - устанавливает зависимости
+    - запускает flake8, isort (check-only) и black (check)
+    - запускает pytest
+- build_images:
+    - зависит от lint_and_tests
+    - проверяет сборку docker-образа локально (не пушит)
+- deploy:
+    - выполняется только при push в ветку `main`
+    - использует SSH (appleboy/ssh-action) и выполняет деплой на удалённый сервер через docker compose prod
+
+Важно для ревьюера (учителя): в CI в job `lint_and_tests` в переменных окружения уже прописан
+`SECRET_KEY: test-secret-key` и `DEBUG: 'True'` — это сделано, чтобы тесты и импорт настроек работали в CI. Поэтому CI
+тесты не должны падать из-за отсутствия SECRET_KEY.
 
 ---
 
@@ -184,7 +190,8 @@ sudo usermod -aG docker $USER
 
 Перезайдите в сессию, если добавляли пользователя в группу docker.
 
-2. Клонируйте репозиторий и подготовьте `.env` на сервере (в production используйте безопасный SECRET_KEY и реальные значения):
+2. Клонируйте репозиторий и подготовьте `.env` на сервере (в production используйте безопасный SECRET_KEY и реальные
+   значения):
 
 ```bash
 git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ> /opt/skillshare
@@ -213,33 +220,38 @@ docker compose -f docker-compose.prod.yml logs -f backend
 
 5. Скрипт deploy
 
-В папке `deploy/` есть `deploy.sh` — можно запускать его вручную на сервере. Скрипт ожидает, что в `DEPLOY_PATH` есть `.env`.
-
+В папке `deploy/` есть `deploy.sh` — можно запускать его вручную на сервере. Скрипт ожидает, что в `DEPLOY_PATH` есть
+`.env`.
 
 ## Создание VM в Yandex Cloud (UI — пошагово, простой вариант)
 
-Ниже — подробные шаги, которые понятны учителю или любому другому проверяющему. Мы предполагаем Ubuntu 22.04 LTS и что у вас есть доступ в консоль Yandex Cloud.
+Ниже — подробные шаги, которые понятны учителю или любому другому проверяющему. Мы предполагаем Ubuntu 22.04 LTS и что у
+вас есть доступ в консоль Yandex Cloud.
 
 1. Войдите в Yandex Cloud Console: https://console.cloud.yandex.ru/
 2. Выберите облако (Cloud) и каталог (Folder).
 3. Перейдите в Compute Cloud → VM instances → Create instance.
 4. Заполните поля:
-   - Name: skillshare-backend (или любое другое понятное имя).
-   - Zone: выберите доступную зону, например ru-central1-a.
-   - Image: Ubuntu 22.04 LTS.
-   - Resources: 1 vCPU, 1–2 GB RAM (для теста достаточно), дисковое пространство 20 GB.
-   - External IP: включите «Assign public IPv4 address» (или создайте зарезервированный IP — см. пункт ниже).
-   - SSH keys: вставьте содержимое вашего публичного SSH-ключа (~/.ssh/id_ed25519.pub). Имя пользователя для SSH будет показано в UI (обычно ubuntu/yc-user).
+    - Name: skillshare-backend (или любое другое понятное имя).
+    - Zone: выберите доступную зону, например ru-central1-a.
+    - Image: Ubuntu 22.04 LTS.
+    - Resources: 1 vCPU, 1–2 GB RAM (для теста достаточно), дисковое пространство 20 GB.
+    - External IP: включите «Assign public IPv4 address» (или создайте зарезервированный IP — см. пункт ниже).
+    - SSH keys: вставьте содержимое вашего публичного SSH-ключа (~/.ssh/id_ed25519.pub). Имя пользователя для SSH будет
+      показано в UI (обычно ubuntu/yc-user).
 5. Создайте/проверьте правила брандмауэра (Security group / Network security):
-   - Откройте порты: TCP 22 (SSH), TCP 80 (HTTP), TCP 443 (HTTPS).
-   - При необходимости откройте TCP 8001, если вы хотите, чтобы бэкенд слушал напрямую на этом порту.
+    - Откройте порты: TCP 22 (SSH), TCP 80 (HTTP), TCP 443 (HTTPS).
+    - При необходимости откройте TCP 8001, если вы хотите, чтобы бэкенд слушал напрямую на этом порту.
 6. Нажмите Create. После запуска запомните внешний IP (Public IPv4).
 
 Резервирование (статический) внешнего IP — рекомендовано:
-- В Console: Network → External IP addresses → Create external IPv4 address (Reserved). Привяжите адрес к вашей VM или оставьте неподвязанным и привяжите позже.
+
+- В Console: Network → External IP addresses → Create external IPv4 address (Reserved). Привяжите адрес к вашей VM или
+  оставьте неподвязанным и привяжите позже.
 - Преимущество: IP не меняется после перезапуска VM.
 
 Подключение по SSH:
+
 - ssh ubuntu@<PUBLIC_IP>  (пользователь смотрите в UI)
 
 Установка Docker и Docker Compose (на VM, Ubuntu):
@@ -279,7 +291,9 @@ docker compose -f docker-compose.prod.yml exec -T backend python manage.py colle
 ```
 
 Проверка:
-- Откройте http://<PUBLIC_IP>/ — должен быть доступен Swagger UI (если backend успешно поднялся и nginx проксирует запросы).
+
+- Откройте http://<PUBLIC_IP>/ — должен быть доступен Swagger UI (если backend успешно поднялся и nginx проксирует
+  запросы).
 - Просмотрите логи: docker compose -f docker-compose.prod.yml logs -f backend
 
 ---
@@ -309,33 +323,31 @@ yc compute instance get --name skillshare-backend --format json | jq -r '.networ
 
 Дальше выполняйте те же шаги по подключению, установке Docker и деплою, что описано выше.
 
-Если нужно, могу добавить в README ещё более подробную инструкцию с снимками экрана или автоматическим сценарием (`yc` + настройка резервного IP) — скажите, нужно ли это.
-
----
-
-
----
-
----
 
 ## Чек‑лист для учителя (быстрая проверка)
+Публичный IP 158.160.22.96
 
 Ниже — пошаговый список с чекбоксами, чтобы быстро проверить проект во время ревью.
 Учитель может пройти пункты по порядку.
 
-- [ ] CI: Открыть GitHub Actions → запустить workflow (или проверить последний прогон) и убедиться, что jobs `Lint and Tests` и `Build Docker images (check)` проходят.
-- [ ] Локальный запуск: следуя разделу «Быстрый старт», поднять проект локально через Docker Compose и проверить, что Swagger UI доступен по http://localhost:8001/api/schema/swagger-ui/.
+- [ ] CI: Открыть GitHub Actions → запустить workflow (или проверить последний прогон) и убедиться, что jobs
+  `Lint and Tests` и `Build Docker images (check)` проходят.
+- [ ] Локальный запуск: следуя разделу «Быстрый старт», поднять проект локально через Docker Compose и проверить, что
+  Swagger UI доступен по http://localhost:8001/api/schema/swagger-ui/.
 - [ ] Тесты: выполнить `pytest -q` и убедиться, что все тесты проходят.
-- [ ] Линтеры: запустить `flake8 .`, `black --check .`, `isort --check-only --profile black .` — предупреждений быть не должно.
+- [ ] Линтеры: запустить `flake8 .`, `black --check .`, `isort --check-only --profile black .` — предупреждений быть не
+  должно.
 - [ ] Демонстрация функционала (по шагам):
-  - [ ] Зарегистрироваться (POST /api/users/),
-  - [ ] Получить токен (POST /api/token/),
-  - [ ] Создать курс / урок (если это предусмотрено для вашей роли),
-  - [ ] Инициировать платёж (POST /api/payments/create/) — в тестовом режиме Stripe возвращает ссылку (если STRIPE_SECRET_KEY настроен),
-  - [ ] Проверить подписки на курс (POST /api/courses/subscribe/).
-- [ ] Деплой (опционально): если вы развернули проект на VM с публичным IP, открыть публичный IP или домен и проверить, что API и Swagger доступны (http/https).
+    - [ ] Зарегистрироваться (POST /api/users/),
+    - [ ] Получить токен (POST /api/token/),
+    - [ ] Создать курс / урок (если это предусмотрено для вашей роли),
+    - [ ] Инициировать платёж (POST /api/payments/create/) — в тестовом режиме Stripe возвращает ссылку (если
+      STRIPE_SECRET_KEY настроен),
+    - [ ] Проверить подписки на курс (POST /api/courses/subscribe/).
+- [ ] Деплой (опционально): если вы развернули проект на VM с публичным IP, открыть публичный IP или домен и проверить,
+  что API и Swagger доступны (http/https).
 
-Примечание для учителя: если у студента нет возможности предоставить публичный IP, можно попросить его запустить проект локально или прислать ngrok‑ссылку для быстрой проверки.
+
 
 ---
 
@@ -343,13 +355,16 @@ yc compute instance get --name skillshare-backend --format json | jq -r '.networ
 
 1) GitHub Secrets (используются в workflow для деплоя и / или доступа по SSH):
 
-- SSH_PRIVATE_KEY — приватный SSH ключ (PEM/OPENSSH) для подключения к серверу при деплое (размещается в secret и используется appleboy/ssh-action). Значение: содержимое приватного ключа (id_ed25519 или id_rsa).
-- SSH_HOST (или SERVER_HOST) — публичный IP или доменное имя сервера (для удобства можно оставить пустым для локальных прогонов, но для deploy должен быть задан).
+- SSH_PRIVATE_KEY — приватный SSH ключ (PEM/OPENSSH) для подключения к серверу при деплое (размещается в secret и
+  используется appleboy/ssh-action). Значение: содержимое приватного ключа (id_ed25519 или id_rsa).
+- SSH_HOST (или SERVER_HOST) — публичный IP или доменное имя сервера (для удобства можно оставить пустым для локальных
+  прогонов, но для deploy должен быть задан).
 - SSH_USERNAME (или SERVER_USER) — пользователь на сервере (например ubuntu или deploy).
 - SSH_PORT (опционально) — порт SSH (по умолчанию 22).
 - DEPLOY_PATH — путь на сервере, например /opt/skillshare (скрипт deploy будет работать с этой папкой).
 
-Рекомендация: добавьте SSH_PRIVATE_KEY как секрет в репозитории: Settings → Secrets and variables → Actions → New repository secret.
+Рекомендация: добавьте SSH_PRIVATE_KEY как секрет в репозитории: Settings → Secrets and variables → Actions → New
+repository secret.
 
 2) Переменные .env на сервере (production) — пример значений (в файле .env, НЕ в репозитории):
 
@@ -386,18 +401,22 @@ DEFAULT_FROM_EMAIL=webmaster@your.domain.com
 ```
 
 Примечания:
+
 - Никогда не храните реальные секреты в репозитории. Используйте .env на сервере и GitHub Secrets для pipeline/Actions.
-- В docker-compose.prod.yml сервисы читают `.env` (env_file: ./.env). Убедитесь, что файл находится в DEPLOY_PATH на сервере и заполнен корректно.
+- В docker-compose.prod.yml сервисы читают `.env` (env_file: ./.env). Убедитесь, что файл находится в DEPLOY_PATH на
+  сервере и заполнен корректно.
 
 3) CI (локальные значения для прогонов тестов в Actions):
 
-- В workflow уже задана переменная SECRET_KEY=test-secret-key и DEBUG='True' для job `lint_and_tests`. Это безопасно для CI, но в продакшне используйте настоящий SECRET_KEY.
+- В workflow уже задана переменная SECRET_KEY=test-secret-key и DEBUG='True' для job `lint_and_tests`. Это безопасно для
+  CI, но в продакшне используйте настоящий SECRET_KEY.
 
 ---
 
 ## Использование скрипта deploy/create_yc_vm.sh
 
-В репозитории добавлен скрипт deploy/create_yc_vm.sh — он упрощает создание VM в Yandex Cloud и подготовку SSH‑ключа для деплоя.
+В репозитории добавлен скрипт deploy/create_yc_vm.sh — он упрощает создание VM в Yandex Cloud и подготовку SSH‑ключа для
+деплоя.
 
 Пример использования:
 
@@ -406,9 +425,5 @@ DEFAULT_FROM_EMAIL=webmaster@your.domain.com
 ./deploy/create_yc_vm.sh --name skillshare-backend --zone ru-central1-a --reserve-ip
 ```
 
-Скрипт сохраняет приватный ключ в deploy/yc_deploy_key — не коммитьте его, а вставьте содержимое как GitHub Secret `SSH_PRIVATE_KEY`.
-
----
-
-
-Удачи! Если нужно — подготовлю краткий чек-лист для проверки с оценочными критериями (например: lint OK, tests OK, deployment OK, feature demo working).
+Скрипт сохраняет приватный ключ в deploy/yc_deploy_key — не коммитьте его, а вставьте содержимое как GitHub Secret
+`SSH_PRIVATE_KEY`.
