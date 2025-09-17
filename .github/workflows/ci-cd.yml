@@ -48,11 +48,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -76,6 +86,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -101,20 +113,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          port: ${{ secrets.SSH_PORT }}
+          # support both naming conventions: SSH_* and SERVER_* (fallback)
+          host: ${{ secrets.SSH_HOST || secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME || secrets.SERVER_USER }}
+          port: ${{ secrets.SSH_PORT || secrets.SERVER_PORT || '22' }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -e
+            set -euo pipefail
             # branch name passed from workflow
             export GITHUB_REF_NAME="${{ github.ref_name }}"
-            export DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}
+            # allow DEPLOY_PATH from secrets under both names
+            DEPLOY_PATH=${{ secrets.DEPLOY_PATH || secrets.DEPLOY_PATH }}
             echo "Deploying branch $GITHUB_REF_NAME to $DEPLOY_PATH"
+            if [ -z "$DEPLOY_PATH" ]; then
+              echo "DEPLOY_PATH is not set. Please configure DEPLOY_PATH secret." >&2
+              exit 1
+            fi
             if [ ! -d "$DEPLOY_PATH" ]; then
               mkdir -p "$DEPLOY_PATH"
               git clone https://github.com/${{ github.repository }} "$DEPLOY_PATH"
@@ -128,9 +148,18 @@ jobs:
               echo ".env not found in $DEPLOY_PATH. Please create it from .env.example and add production values." >&2
               exit 1
             fi
-            # Build & run with Docker Compose
+            # Build & run with Docker Compose (v2)
             docker compose -f docker-compose.prod.yml pull || true
             docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+            # Wait for backend healthcheck (max 60s)
+            for i in $(seq 1 12); do
+              if docker compose -f docker-compose.prod.yml ps --services --filter "status=running" | grep -q backend; then
+                echo "Backend container running"
+                break
+              fi
+              echo "Waiting for backend to start... ($i)"
+              sleep 5
+            done
             # Run migrations and collectstatic in backend
             docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput || true
             docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || true
