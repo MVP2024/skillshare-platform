@@ -10,18 +10,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-# DEBUG should be explicitly set via environment variable in production
+# В рабочей среде DEBUG должен быть явно задан с помощью переменной среды
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# ALLOWED_HOSTS - comma separated list in env
-raw_allowed = os.getenv("ALLOWED_HOSTS", "*")
-ALLOWED_HOSTS = [h.strip() for h in raw_allowed.split(",") if h.strip()]
-
-# Base URL used by services like Stripe callbacks
-BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
-
-if not SECRET_KEY and not DEBUG:
-    raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
+# Если SECRET_KEY не указан, разрешите безопасный откат при запуске в CI/тестах
+# (GitHub Actions устанавливает GITHUB_ACTIONS=true). Для производственных запусков без отладки требуется SECRET_KEY.
+if not SECRET_KEY:
+    gha = os.getenv("GITHUB_ACTIONS", "").lower()
+    ci_env = os.getenv("CI", "").lower()
+    pytest_cur = os.getenv("PYTEST_CURRENT_TEST")
+    if gha == "true" or ci_env == "true" or pytest_cur:
+        # Используем несекретный фиксированный ключ только в средах CI / тестирования
+        SECRET_KEY = "test-secret-key"
+    elif not DEBUG:
+        raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -182,8 +184,10 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# Email settings
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+# Настройки Email
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"

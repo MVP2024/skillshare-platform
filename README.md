@@ -1,602 +1,429 @@
 # SkillShare Platform Backend
 
-![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
-![Django REST Framework](https://img.shields.io/badge/DRF-FF1709?style=for-the-badge&logo=django&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+Краткое и понятное руководство для разработчиков и преподавателя, который будет проверять проект.
 
-## Описание проекта
+Badges: Django, DRF, Python, PostgreSQL, Docker
 
-Этот проект представляет собой бэкенд для платформы онлайн-обучения, аналогичной SkillShare, разработанный с
-использованием Django и Django REST Framework. Он предоставляет API для управления пользователями, курсами, уроками и
-платежами.
+---
 
-### Основные возможности:
+## Что в репозитории
 
-* **Управление пользователями**: Регистрация, авторизация, профили пользователей.
-* **Курсы и уроки**: Создание, просмотр, обновление и удаление курсов и уроков.
-* **Платежи**: Запись и отслеживание платежей за курсы и уроки.
-* **Фильтрация и сортировка**: Гибкие возможности для поиска и упорядочивания платежей.
-* **История платежей**: Просмотр истории платежей в профиле пользователя.
-* **Ролевая модель доступа**: Разграничение прав доступа для суперпользователей, модераторов и обычных пользователей (
-  владельцев контента).
-* **Автоматическая пагинация**: Пагинация списков курсов и уроков для оптимизации загрузки данных.
-* **Загрузка начальных данных**: Кастомная команда для удобной загрузки тестовых данных (пользователей, курсов, уроков,
-  платежей, групп).
-* **Платежная система**: Интеграция со Stripe для обработки платежей за курсы и уроки.
-* **Фоновые задачи с Celery**:
-    * Асинхронная отправка уведомлений об обновлении курсов.
-    * Периодическая деактивация неактивных пользователей.
+Это бэкенд на Django + Django REST Framework для учебной платформы (курсы, уроки, платежи, пользователи). Основные папки
+и файлы:
 
-## Структура проекта
+- `skillshare_platform/` — настройки Django, URL, wsgi/asgi, celery.
+- `users/` — приложение пользователей и платежей.
+- `materials/` — приложения курсов и уроков.
+- `docker-compose.yaml` — локальная конфигурация для разработки.
+- `docker-compose.prod.yml` — конфигурация для продакшн (VM).
+- `.github/workflows/ci-cd.yml` — GitHub Actions: линтеры, тесты, сборка образов и deploy.
+- `.env.example` — пример переменных окружения.
+- `requirements.txt` — зависимости.
+- `deploy/` — вспомогательные файлы для деплоя (nginx конфиг, скрипт deploy.sh).
 
-* `skillshare_platform/`: Основные настройки проекта Django, корневые URL-адреса.
-* `users/`: Приложение для управления пользователями, их профилями и платежами. Содержит модели `User` и `Payment`,
-  сериализаторы, представления и URL-адреса.
-* `materials/`: Приложение для управления учебными материалами (курсами и уроками). Содержит модели `Course` и `Lesson`,
-  сериализаторы, представления и URL-адреса.
-* `media/`: Директория для хранения загружаемых пользователями файлов (аватары, превью курсов/уроков).
-* `env/`, `.venv/`: Виртуальные окружения (игнорируются Git).
-* `.env`, `.env.example`: Файлы для хранения переменных окружения.
-* `requirements.txt`: Список всех зависимостей проекта.
-* `manage.py`: Утилита командной строки Django для выполнения административных задач.
+---
 
-## Установка и запуск
+## Кратко о возможностях
 
-Следуйте этим шагам, чтобы настроить и запустить проект локально.
+- регистрация/авторизация пользователей (JWT)
+- CRUD для курсов и уроков
+- система ролей: суперпользователь, модератор, владелец курса/урока
+- история платежей, интеграция со Stripe (тестовый режим)
+- фоновые задачи через Celery + Redis
+- миграции и фикстуры для тестовых данных
 
-### 1. Клонирование репозитория
+---
 
-```
-    git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ>
-    cd SkillShare
+## Быстрый старт (локально, с venv)
+
+1. Клонируйте репозиторий и зайдите в папку:
+
+```bash
+git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ>
+cd SkillShare
 ```
 
-### 2. Создание и активация виртуального окружения
+2. Создайте и активируйте виртуальное окружение (пример для Windows PowerShell / Linux/macOS):
 
-Рекомендуется создать окружение в папке .venv (PyCharm умеет автоматически подхватывать .venv), но можно использовать любое имя (например venv).
+Windows PowerShell:
 
-Windows (PowerShell)
-
-```
+```powershell
 python -m venv .venv
-# активировать в текущем сеансе PowerShell (dot-sourcing: точка + пробел)
-# если политика выполнения блокирует, можно временно разрешить для текущего процесса:
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 . .\.venv\Scripts\Activate.ps1
 ```
 
-Windows (CMD)
+Linux/macOS:
 
-```
-python -m venv venv
-.venv\Scripts\activate.bat
-```
-
-Git Bash / WSL / macOS / Linux
-
-```
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Примечание: если вы не хотите/не можете активировать окружение, можно запускать pip через конкретный python из venv без активации:
+3. Установите зависимости:
 
-```
-.\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-После активации рекомендуется использовать:
-
-```
+```bash
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-
-### 3. Установка зависимостей
-
-Установите все необходимые библиотеки из requirements.txt:
+4. Создайте `.env` в корне проекта, скопировав `.env.example` и подставив значения. В локальной разработке достаточно:
 
 ```
-    pip install -r requirements.txt
-```
-### 4. Установка и запуск с Docker
-
-Для упрощения развертывания и обеспечения единообразной среды разработки, проект можно запускать с использованием Docker и Docker Compose.
-
-**1. Убедитесь, что Docker установлен:**
-
-Вам потребуется Docker Desktop (для Windows/macOS) или Docker Engine (для Linux). Установите его, если он еще не установлен:
-
-*   **Docker Desktop (Windows/macOS):** [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
-*   **Docker Engine (Linux):** Следуйте инструкциям для вашего дистрибутива на [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
-
-**2. Проект использует PostgreSQL.** 
-
-Убедитесь, что у вас установлен и запущен PostgreSQL, и создайте базу данных, указанную в `.env.`
-
-**3. Настройка переменных окружения:**
-
-**Создайте файл `.env` в корне проекта на основе `.env.example` и заполните его необходимыми значениями.
-Обязательно укажите:**
-
-## Пример заполнения `.env`
-```
-SECRET_KEY=ваше_секретное_значение
-```
-
-**Настройки базы данных (POSTGRESQL):**
-```
-DB_NAME=<ваша БД>
-DB_USER=<пользователь, например postgres>
-DB_PASSWORD=<пароль БД>
-DB_HOST=<например db, так как это имя сервиса в docker-compose или localhost>
+SECRET_KEY=dev-secret
+DEBUG=True
+DB_NAME=skillshare
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=127.0.0.1
 DB_PORT=5432
-```
-
-**Настройки stripe:**
-```
-STRIPE_SECRET_KEY=sk_test_ваш_секретный_ключ
-BASE_URL=http://localhost:8001
-```
-
-**Настройки Redis для Celery**::
-
-Смотри [ниже](#5-установка-и-запуск-redis)
-
-```
-REDIS_HOST=localhost
+REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-REDIS_DB=0
 ```
 
-**Настройки Email:**:
+(Если используете Docker — переменные можно хранить в `.env` и Docker Compose подхватит их.)
 
-**По умолчанию для тестирования в `settings.py` используется `django.core.mail.backends.console.EmailBackend`, который
-  выводит письма в консоль.
-  `EMAIL_HOST_USER` должен быть заполнен **валидным email-адресом (даже тестовым)**, чтобы избежать ошибок кодирования
-  при
-  отправке писем. Например:**
-```
-EMAIL_HOST_USER="noreply@skillshare.com"
-DEFAULT_FROM_EMAIL="noreply@skillshare.com"
-```
+5. Простейший способ запустить локально — через Docker Compose (рекомендуется):
 
-**Для реальной отправки писем через SMTP раскомментируйте соответствующие строки в `.env` и заполните их:**
-```
-EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST=smtp.your_email_provider.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_USE_SSL=False
-EMAIL_HOST_USER=your_email@example.com
-EMAIL_HOST_PASSWORD=your_email_password
-```
-
-**4. Запуск Docker Compose:**
-
-Перейдите в корневую директорию проекта, где находится docker-compose.yaml, и выполните команду:
-```
+```bash
 docker-compose up -d --build
 ```
-- up: Запускает контейнеры, определенные в docker-compose.yaml.
-- -d: Запускает контейнеры в фоновом режиме (detached mode).
-- --build: Пересобирает образы Docker перед запуском, если были изменения в Dockerfile или контексте сборки.
-- Используйте это при первом запуске или после внесения изменений в зависимости/Dockerfile.
 
-**Что произойдет после запуска:**
+После запуска сайт будет доступен по: http://localhost:8001/ (порт проброшен на 8001 в `docker-compose.yaml`).
+Документация API: http://localhost:8001/api/schema/swagger-ui/
 
-Docker Compose создаст и запустит несколько сервисов:
+6. Команды внутри контейнера (пример):
 
-- db: Контейнер PostgreSQL (база данных).
-- redis: Контейнер Redis (брокер сообщений для Celery, кеширование).
-- backend: Контейнер с вашим Django-приложением. При первом запуске он выполнит миграции базы данных, загрузит начальные данные (фикстуры) и запустит Django-сервер.
-
-* **Выполнение миграций и загрузка данных (только при первом запуске):
-Если вы запускаете проект в первый раз, Docker Compose автоматически выполнит миграции базы данных и загрузит начальные фикстуры. 
-Вы можете убедиться в этом, просмотрев логи контейнера backend:**
-* 
-  ```
-      docker-compose logs backend
-  ```
-
-* **или выполнив команды вручную, если это необходимо:**
-
-    ```
-    docker-compose exec backend python manage.py migrate
-    docker-compose exec backend python manage.py load_initial_data
-    ```
-
-- celery_worker: Контейнер с Celery Worker для обработки асинхронных задач.
-- celery_beat: Контейнер с Celery Beat для планирования периодических задач.
-
-После запуска, Django-сервер будет доступен по адресу http://localhost:8001/.
-Вы будете автоматически перенаправлены на интерактивную документацию API (Swagger UI).
-
-**5. Проверка состояния контейнеров:**
-
-Чтобы убедиться, что все контейнеры запущены и работают, используйте:
-```
-docker-compose ps
-```
-**6. Остановка и удаление контейнеров:**
-
-- **Остановка (без удаления данных):**
-```
-docker-compose stop
-```
-
-- **Остановка и удаление контейнеров, сетей и томов (volumes) с данными:**
-```
-docker-compose down -v
-```
-### `Используйте -v, чтобы также удалить тома с данными базы данных и медиафайлами, если вы хотите начать "с чистого листа".`
-
-**7. Запуск команд внутри контейнера (например, createsuperuser):**
-
-### Вам может потребоваться выполнить команды Django внутри работающего контейнера backend. Например, для создания суперпользователя:
-```
+```bash
+# выполнить миграции
+docker-compose exec backend python manage.py migrate --noinput
+# загрузить тестовые данные (фикстура)
+docker-compose exec backend python manage.py load_initial_data
+# создать суперпользователя
 docker-compose exec backend python manage.py createsuperuser
 ```
-Далее следуйте подсказкам в терминале.
 
-**8. Настройка PyCharm (Run/Debug Configurations):**
+7. Остановка:
 
-Для удобства разработки вы можете настроить PyCharm для запуска и отладки проекта через Docker Compose.
-
-1. Откройте Run -> Edit Configurations...
-2. Нажмите + и выберите Docker Compose.
-3. Name: Присвойте осмысленное имя, например, SkillShare Backend (Docker).
-4. Configuration files: Укажите путь к вашему docker-compose.yaml (обычно просто docker-compose.yaml).
-5. Service: Выберите backend. Это сервис, который запускает ваш Django-сервер.
-    Before launch:
-- Рекомендуется добавить шаг Build для сервиса backend, чтобы PyCharm автоматически пересобирал образ при изменениях в Dockerfile. Нажмите + -> Build service images. Выберите backend.
-- Убедитесь, что базы данных и Redis готовы. Вы можете добавить шаги Run another configuration и выбрать Docker Compose для db и redis с командой up или start. Однако, depends_on в docker-compose.yaml и healthcheck обычно достаточно, чтобы backend ждал эти сервисы.
-
-6. Environment variables: PyCharm автоматически подтянет переменные из вашего .env файла, если он находится в корне проекта.
-7. Path mappings: Убедитесь, что пути к вашему проекту на локальной машине и внутри контейнера правильно сопоставлены (.:/app должно быть установлено по умолчанию, если вы используете build: .).
-8. Command: Установите python manage.py runserver 0.0.0.0:8000. PyCharm может автоматически предложить это.
-
-### **После настройки вы сможете запускать и отлаживать ваш Django-проект, используя кнопки Run/Debug в PyCharm, и он будет взаимодействовать с базой данных и Redis внутри Docker-контейнеров.**
-
-### Переход по ссылке:
-
-**После успешного запуска проекта через Docker Compose (или PyCharm), ваш API будет доступен по адресу:**
-
-- API Documentation (Swagger UI): http://localhost:8001/api/schema/swagger-ui/
-
-Вы можете перейти по этой ссылке в браузере, чтобы просмотреть интерактивную документацию и тестировать ваши API-эндпоинты. 
-Для эндпоинтов, требующих аутентификации, используйте раздел "Аутентификация (JWT)". Смотри [ниже](#аутентификация-jwt) в этом README.
-
-# N.B.:
-**Проект включает кастомную команду для загрузки тестовых данных (пользователей, курсов, уроков, платежей) из фикстуры
-materials/fixtures/initial_data.json. Эта команда также удаляет существующие данные перед загрузкой, чтобы избежать
-дублирования.**
-
-**Если вы вдруг захотите загрузить фикстуру вручную (без удаления существующих данных), используйте:**
-```
-    python -Xutf8 manage.py loaddata materials/fixtures/initial_data.json
-```
-**Чтобы создать фикстуру с уже имеющими у Вас данными используйте это:**
-```
-     python -Xutf8 manage.py dumpdata users.user materials.course materials.lesson users.payment --indent 4 > materials/fixtures/initial_data.json
+```bash
+docker-compose down -v
 ```
 
-### 5. Установка и запуск Redis
+---
 
+## Запуск тестов и линтеров (локально)
 
-**Если вы используете Docker Compose (рекомендуется):**
+Перед пушем/PR:
 
-Redis уже настроен как сервис в `docker-compose.yaml` и будет запущен автоматически при выполнении `docker-compose up`.
-Вам не нужно устанавливать его отдельно на вашей машине.
+- Форматирование/сортировка импортов:
 
-**Если вы не используете Docker Compose и запускаете проект локально:**
-
-Redis требуется для работы Celery и кеширования (настроен в `settings.py` через `CELERY_BROKER_URL` и `CELERY_RESULT_BACKEND`).
-Redis требуется для работы кеширования (настроен в `settings.py` через `CACHES`).
-
-## Установка
-
-**Windows**:
-
-1. Скачайте Redis с [официального репозитория](https://github.com/microsoftarchive/redis/releases)
-2. Установите через установщик или запустите `redis-server.exe` напрямую
-
-**Linux**:
-
-```
-    sudo apt update
-    sudo apt install redis
+```bash
+isort --profile black .
+black .
 ```
 
-## Запуск
+- Проверка стиля и линтеры:
 
-**Windows:**
-
-```
-    redis-server.exe
+```bash
+flake8 .
 ```
 
-**Linux:**
+- Запуск тестов:
 
-```
-    sudo service redis start
-    # Или
-    redis-server
+```bash
+pytest --maxfail=1 --disable-warnings -q
 ```
 
-## Проверка
-
-```
-    redis-cli ping
-    # Ожидаемый ответ: PONG
-```
-
-# Функционал Celery Задач
-
-Проект использует Celery для выполнения фоновых и периодических задач. Настройки Celery, включая расписание для Celery
-Beat, определены в skillshare_platform/settings.py.
-
-## 1. Отправка уведомлений об обновлении курсов (materials.tasks.send_course_update_notification)
-
-Эта задача отвечает за асинхронную рассылку писем пользователям, подписанным на курс, когда материалы курса обновляются.
-
-**Как это работает:**
-- Когда курс (или его урок) обновляется через API (CourseViewSet.perform_update или
-LessonRetrieveUpdateDestroyAPIView.perform_update), запускается задача send_course_update_notification.
-
-- Задача отправляется асинхронно в Celery Worker.
-
-- Уведомление отправляется, только если более четырех часов прошло с момента последнего уведомления о данном курсе, чтобы
-избежать спама.
-
-- Письма отправляются индивидуально каждому подписчику курса.
-
-## 2. Деактивация неактивных пользователей (materials.tasks.deactivate_inactive_users)
-
-Это периодическая задача, которая автоматически деактивирует пользователей, не заходивших на сайт в течение длительного
-времени.
-
-**Как это работает:**
-- Задача запускается Celery Beat по расписанию, определенному в skillshare_platform/settings.py (по умолчанию, раз в 30
-дней).
-
-- Она проверяет поле last_login у всех активных пользователей, исключая суперпользователей.
-
-- Если пользователь не заходил более одного месяца, его аккаунт деактивируется (is_active устанавливается в False).
-
-- Каждому деактивированному пользователю отправляется индивидуальное уведомление по электронной почте о деактивации
-аккаунта.
-
-# Использование API
-
-**Автоматическое перенаправление на документацию:**
-При доступе к корневому URL вашего сервера (`http://127.0.0.1:8001/`), вы будете автоматически перенаправлены на
-интерактивную документацию API (Swagger UI) по адресу `http://127.0.0.1:8001/api/schema/swagger-ui/`.
-
-Вы можете взаимодействовать с API с помощью инструментов, таких как Postman, Insomnia или непосредственно через браузер.
-
-## Аутентификация (JWT)
-
-Для получения токенов и доступа к защищенным эндпоинтам используйте следующие шаги:
-
-1. **Получение токенов (логин)**:
-    * **Эндпоинт**: `POST /api/token/`
-    * **Тело запроса (JSON)**:
-      ```json
-      {
-          "email": "ваш_email",
-          "password": "ваш_пароль"
-      }
-      ```
-    * **Ответ**: `{"refresh": "...", "access": "..."}`
-
-2. **Использование Access Token**:
-    * Включите `access` токен в заголовок `Authorization` для всех защищенных запросов:
-      `Authorization: Bearer <ваш_access_токен>`
-
-3. **Обновление Access Token**:
-    * **Эндпоинт**: `POST /api/token/refresh/`
-    * **Тело запроса (JSON)**:
-      ```json
-      {
-          "refresh": "ваш_refresh_токен"
-      }
-      ```
-    * **Ответ**: `{"access": "..."}`
-
-# Админ-панель Django
-
-Доступ к админ-панели: `http://127.0.0.1:8001/admin/`
-Используйте учетные данные суперпользователя, созданные ранее, для входа.
-
-# Права доступа и роли
-
-Проект реализует гибкую систему прав доступа на основе ролей пользователей:
-
-* **Суперпользователь (Администратор)**:
-    * **Полный доступ** к просмотру, созданию, редактированию и удалению **всех курсов и уроков**.
-    * Может **просматривать, редактировать и удалять всех пользователей**.
-    * Может **просматривать список всех платежей**.
-
-* **Модератор**:
-    * **Просмотр всех курсов и уроков**.
-    * **Редактирование всех курсов и уроков**, но **не может их удалять**.
-    * **Не может создавать** новые курсы или уроки.
-    * Может **просматривать список всех пользователей и их детали**.
-    * Может **редактировать и удалять свой собственный профиль** через API.
-    * Может **просматривать список всех платежей**.
-
-* **Владелец курса/урока (обычный пользователь)**:
-    * **Просмотр, создание, редактирование и удаление только своих** курсов и уроков.
-    * Может **просматривать список всех пользователей и их детали**.
-    * Может **редактировать и удалять свой собственный профиль** через API.
-    * Может **просматривать список всех платежей** (текущая реализация позволяет видеть все платежи, а не только свои).
-
-* **Неавторизованный пользователь**:
-    * Единственное доступное действие — **регистрация нового пользователя** (`POST /api/users/`).
-    * Все остальные эндпоинты требуют аутентификации.
-
-# Основные эндпоинты API
-
-Базовый URL для всех API-запросов: `http://127.0.0.1:8001/api/`
-
-## Пользователи
-
-- **Регистрация нового пользователя**: `POST /api/users/` (доступно без аутентификации)
-- **Получить список пользователей**: `GET /api/users/` (требуется аутентификация)
-- **Получить детали пользователя (включая платежи)**: `GET /api/users/{id}/` (требуется аутентификация)
-- **Обновить свой профиль**: `PUT /api/profile/` (требуется аутентификация)
-
-## Платежи
-
-- **Получить список платежей**: `GET /api/payments/` (требуется аутентификация)
-
-## Сортировка:
-
-- **По дате оплаты (по возрастанию)**: `GET /api/payments/?ordering=payment_date`
-- **По дате оплаты (по убыванию)**: `GET /api/payments/?ordering=-payment_date`
-
-## Комбинированная фильтрация и сортировка:
-
-- `GET /api/payments/?paid_course=1&payment_method=cash&ordering=-payment_date`
-
-# Курсы
-
-- **Получить список курсов**: `GET /api/courses/` (требуется аутентификация)
-- **Получить детали курса (включая уроки и их количество)**: `GET /api/courses/{id}/` (требуется аутентификация)
-
-# Уроки
-
-- **Получить список уроков**: `GET /api/lessons/` (требуется аутентификация)
-- **Получить детали урока**: `GET /api/lessons/{id}/` (требуется аутентификация)
-
-# Пример использования в Postman
-
-- Запустите сервер Django.
-- Откройте Postman.
-- Создайте новый запрос.
-- Выберите метод `GET`.
-- Введите URL, например: `http://127.0.0.1:8001/api/payments/?payment_method=cash&ordering=-payment_date`
-- Нажмите "Send".
-
-# Интеграция Stripe
-
-Проект интегрирован со Stripe для обработки платежей.
-
-## Настройка Stripe API ключей
-
-Для работы с платежами Stripe вам потребуется получить ключи API.
-Используйте тестовые ключи для разработки.
-
-1.  **Зарегистрируйтесь или войдите в аккаунт Stripe:**
-    Перейдите на [https://dashboard.stripe.com/](https://dashboard.stripe.com/)
-
-2.  **Получите API ключи:**
-    *   В вашей панели управления Stripe перейдите в раздел **"Разработчики"** (Developers) -> **"Ключи API"** (API keys).
-    *   Вам понадобятся:
-        *   **Publishable key (публикуемый ключ)**: Используется на фронтенде (если есть) и обычно не является секретным.
-        *   **Secret key (секретный ключ)**: Используется на бэкенде и должен храниться в строжайшем секрете.
-    *   Убедитесь, что вы используете **тестовые ключи** для разработки, которые начинаются с `pk_test_` и `sk_test_`.
-
-3.  **Добавьте секретный ключ в ваш `.env` файл:**
-    В корневом файле `.env` добавьте или обновите переменную `STRIPE_SECRET_KEY`:
-
-    ```
-    STRIPE_SECRET_KEY=sk_test_ваш_секретный_ключ
-    ```
-
-## Инициирование платежа
-
-Для создания новой платежной сессии Stripe используйте следующий эндпоинт:
-
-- **Создать платеж**: `POST /api/payments/create/` (требуется аутентификация)
-    * **Тело запроса (JSON)**: Необходимо указать либо `paid_course`, либо `paid_lesson`.
-
-  ```json
-  {
-      "paid_course": 1
-  }
-  ```
-  или
-  ```json
-  {
-      "paid_lesson": 5
-  }
-  ```
-
-    * **Ответ**: При успешном запросе возвращается `payment_url`, на который пользователь должен быть перенаправлен для
-      завершения оплаты.
-
-  ```json
-  {
-      "payment_id": 123,
-      "payment_url": "https://checkout.stripe.com/c/pay/cs_test_...",
-      "amount": "123.45",
-      "status": "pending"
-  }
-  ```
-
-## Обработка колбэков Stripe
-
-Stripe перенаправляет пользователя на следующие URL после завершения или отмены платежа. Эти эндпоинты обрабатывают
-изменения статуса платежей в вашей системе:
-
-- **Успешная оплата**: `GET /success/`
-    * Stripe автоматически добавляет параметр `session_id`. Пример:
-      `http://127.0.0.1:8001/success/?session_id=cs_test_...`
-    * Этот эндпоинт обновляет статус соответствующего платежа в вашей базе данных на `succeeded`.
-- **Отмена оплаты**: `GET /cancel/`
-    * Stripe перенаправляет пользователя на этот URL, если платеж был отменен.
-    * Этот эндпоинт обновляет статус соответствующего платежа в вашей базе данных на `failed`.
-
-Вы получите JSON-ответ со списком платежей, отфильтрованных по способу оплаты "Наличные" и отсортированных по дате
-оплаты в убывающем порядке.
-
-### 6. Запуск тестов
-
-Для тестирования функциональности приложения `materials` используются `pytest` и `pytest-cov` для проверки покрытия
-кода.
-
-**Запуск всех тестов для приложения `materials`:**
-
-```
-    pytest materials/
+Если `black`/`isort` предлагают автоправки, лучше применить их и закоммитить.
+
+---
+
+## Что делает CI (GitHub Actions)
+
+Workflow: `.github/workflows/ci-cd.yml`.
+
+Триггеры:
+
+- push в ветки `develop` и `main`
+- pull_request в `develop` и `main`
+- manual (workflow_dispatch)
+
+Jobs:
+
+- lint_and_tests:
+    - запускает контейнеры PostgreSQL и Redis как сервисы
+    - устанавливает зависимости
+    - запускает flake8, isort (check-only) и black (check)
+    - запускает pytest
+- build_images:
+    - зависит от lint_and_tests
+    - проверяет сборку docker-образа локально (не пушит)
+- deploy:
+    - выполняется только при push в ветку `main`
+    - использует SSH (appleboy/ssh-action) и выполняет деплой на удалённый сервер через docker compose prod
+
+Важно для ревьюера (учителя): в CI в job `lint_and_tests` в переменных окружения уже прописан
+`SECRET_KEY: test-secret-key` и `DEBUG: 'True'` — это сделано, чтобы тесты и импорт настроек работали в CI. Поэтому CI
+тесты не должны падать из-за отсутствия SECRET_KEY.
+
+---
+
+## Деплой на удалённый сервер (VM) — вручную
+
+Предполагается, что сервер — Linux (например Ubuntu). Нужно Docker и Docker Compose v2.
+
+1. Установите Docker и docker compose (пример для Ubuntu):
+
+```bash
+# установить Docker (по официальной инструкции)
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+# добавить пользователя в группу docker (по желанию)
+sudo usermod -aG docker $USER
 ```
 
-**Запуск тестов и получение отчета о покрытии кода в консоли:**
+Перезайдите в сессию, если добавляли пользователя в группу docker.
+
+2. Клонируйте репозиторий и подготовьте `.env` на сервере (в production используйте безопасный SECRET_KEY и реальные
+   значения):
+
+```bash
+git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ> /opt/skillshare
+cd /opt/skillshare
+cp .env.example .env
+# Отредактируйте .env: укажите SECRET_KEY, DEBUG=False, базу данных, stripe ключи, REDIS и т.д.
+```
+
+3. Запустите продакшн compose (пример):
+
+```bash
+# из директории проекта
+docker compose -f docker-compose.prod.yml up -d --build
+# запустить миграции и collectstatic
+docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput
+docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput
+```
+
+4. Проверка состояния:
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f backend
+# проверить что контейнер backend в статусе healthy (если настроено) и nginx слушает порт 80
+```
+
+5. Скрипт deploy
+
+В папке `deploy/` есть `deploy.sh` — можно запускать его вручную на сервере. Скрипт ожидает, что в `DEPLOY_PATH` есть
+`.env`.
+
+## Создание VM в Yandex Cloud (UI — пошагово, простой вариант)
+
+Ниже — подробные шаги, которые понятны учителю или любому другому проверяющему. Мы предполагаем Ubuntu 22.04 LTS и что у
+вас есть доступ в консоль Yandex Cloud.
+
+1. Войдите в Yandex Cloud Console: https://console.cloud.yandex.ru/
+2. Выберите облако (Cloud) и каталог (Folder).
+3. Перейдите в Compute Cloud → VM instances → Create instance.
+4. Заполните поля:
+    - Name: skillshare-backend (или любое другое понятное имя).
+    - Zone: выберите доступную зону, например ru-central1-a.
+    - Image: Ubuntu 22.04 LTS.
+    - Resources: 1 vCPU, 1–2 GB RAM (для теста достаточно), дисковое пространство 20 GB.
+    - External IP: включите «Assign public IPv4 address» (или создайте зарезервированный IP — см. пункт ниже).
+    - SSH keys: вставьте содержимое вашего публичного SSH-ключа (~/.ssh/id_ed25519.pub). Имя пользователя для SSH будет
+      показано в UI (обычно ubuntu/yc-user).
+5. Создайте/проверьте правила брандмауэра (Security group / Network security):
+    - Откройте порты: TCP 22 (SSH), TCP 80 (HTTP), TCP 443 (HTTPS).
+    - При необходимости откройте TCP 8001, если вы хотите, чтобы бэкенд слушал напрямую на этом порту.
+6. Нажмите Create. После запуска запомните внешний IP (Public IPv4).
+
+Резервирование (статический) внешнего IP — рекомендовано:
+
+- В Console: Network → External IP addresses → Create external IPv4 address (Reserved). Привяжите адрес к вашей VM или
+  оставьте неподвязанным и привяжите позже.
+- Преимущество: IP не меняется после перезапуска VM.
+
+Подключение по SSH:
+
+- ssh ubuntu@<PUBLIC_IP>  (пользователь смотрите в UI)
+
+Установка Docker и Docker Compose (на VM, Ubuntu):
+
+```bash
+# обновление и необходимые пакеты
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+# установка Docker
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+# (по желанию) добавить пользователя в группу docker
+sudo usermod -aG docker $USER
+# перезайдите в сессию, если добавляли в группу
+```
+
+Далее на сервере:
+
+```bash
+# клонируем проект
+sudo mkdir -p /opt/skillshare
+sudo chown $(whoami) /opt/skillshare
+git clone https://github.com/<your-repo> /opt/skillshare
+cd /opt/skillshare
+cp .env.example .env
+# отредактируйте .env — обязательно SECRET_KEY, DEBUG=False, DB и REDIS значения
+# запустите prod compose
+docker compose -f docker-compose.prod.yml up -d --build
+# миграции и сбор статичных файлов
+docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput || true
+docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || true
+```
+
+Проверка:
+
+- Откройте http://<PUBLIC_IP>/ — должен быть доступен Swagger UI (если backend успешно поднялся и nginx проксирует
+  запросы).
+- Просмотрите логи: docker compose -f docker-compose.prod.yml logs -f backend
+
+---
+
+## Создание VM в Yandex Cloud с помощью CLI (yc) — коротко
+
+Если у вас настроен Yandex CLI (yc), можно создать инстанс командой (пример):
+
+```bash
+# создаём инстанс с публичным IP (пример)
+yc compute instance create \
+  --name skillshare-backend \
+  --zone ru-central1-a \
+  --public-ip \
+  --image-family ubuntu-2204-lts \
+  --platform standard-v1 \
+  --memory 2 \
+  --cores 1 \
+  --ssh-key ~/.ssh/id_ed25519.pub
+```
+
+Получение публичного IP (пример):
+
+```bash
+yc compute instance get --name skillshare-backend --format json | jq -r '.network_interfaces[0].primary_v4_address.one_to_one_nat.address'
+```
+
+Дальше выполняйте те же шаги по подключению, установке Docker и деплою, что описано выше.
+
+
+## Чек‑лист для учителя (быстрая проверка)
+Публичный IP 158.160.22.96
+
+Ниже — пошаговый список с чекбоксами, чтобы быстро проверить проект во время ревью.
+Учитель может пройти пункты по порядку.
+
+- [ ] CI: Открыть GitHub Actions → запустить workflow (или проверить последний прогон) и убедиться, что jobs
+  `Lint and Tests` и `Build Docker images (check)` проходят.
+- [ ] Локальный запуск: следуя разделу «Быстрый старт», поднять проект локально через Docker Compose и проверить, что
+  Swagger UI доступен по http://localhost:8001/api/schema/swagger-ui/.
+- [ ] Тесты: выполнить `pytest -q` и убедиться, что все тесты проходят.
+- [ ] Линтеры: запустить `flake8 .`, `black --check .`, `isort --check-only --profile black .` — предупреждений быть не
+  должно.
+- [ ] Демонстрация функционала (по шагам):
+    - [ ] Зарегистрироваться (POST /api/users/),
+    - [ ] Получить токен (POST /api/token/),
+    - [ ] Создать курс / урок (если это предусмотрено для вашей роли),
+    - [ ] Инициировать платёж (POST /api/payments/create/) — в тестовом режиме Stripe возвращает ссылку (если
+      STRIPE_SECRET_KEY настроен),
+    - [ ] Проверить подписки на курс (POST /api/courses/subscribe/).
+- [ ] Деплой (опционально): если вы развернули проект на VM с публичным IP, открыть публичный IP или домен и проверить,
+  что API и Swagger доступны (http/https).
+
+
+
+---
+
+## GitHub Secrets и .env — что настроить (список и примеры)
+
+1) GitHub Secrets (используются в workflow для деплоя и / или доступа по SSH):
+
+- SSH_PRIVATE_KEY — приватный SSH ключ (PEM/OPENSSH) для подключения к серверу при деплое (размещается в secret и
+  используется appleboy/ssh-action). Значение: содержимое приватного ключа (id_ed25519 или id_rsa).
+- SSH_HOST (или SERVER_HOST) — публичный IP или доменное имя сервера (для удобства можно оставить пустым для локальных
+  прогонов, но для deploy должен быть задан).
+- SSH_USERNAME (или SERVER_USER) — пользователь на сервере (например ubuntu или deploy).
+- SSH_PORT (опционально) — порт SSH (по умолчанию 22).
+- DEPLOY_PATH — путь на сервере, например /opt/skillshare (скрипт deploy будет работать с этой папкой).
+
+Рекомендация: добавьте SSH_PRIVATE_KEY как секрет в репозитории: Settings → Secrets and variables → Actions → New
+repository secret.
+
+2) Переменные .env на сервере (production) — пример значений (в файле .env, НЕ в репозитории):
 
 ```
-    pytest materials/ --cov=materials
+# Django
+SECRET_KEY=very-secret-production-key
+DEBUG=False
+ALLOWED_HOSTS=your.domain.com,123.45.67.89
+
+# Database
+DB_NAME=skillshare
+DB_USER=skillshare_user
+DB_PASSWORD=very-db-password
+DB_HOST=db  # внутри docker-compose это имя сервиса
+DB_PORT=5432
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+BASE_URL=https://your.domain.com
+
+# Email (production)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=smtp_user
+EMAIL_HOST_PASSWORD=smtp_password
+DEFAULT_FROM_EMAIL=webmaster@your.domain.com
 ```
 
-**Запуск тестов и генерация HTML-отчета о покрытии кода:**
+Примечания:
+
+- Никогда не храните реальные секреты в репозитории. Используйте .env на сервере и GitHub Secrets для pipeline/Actions.
+- В docker-compose.prod.yml сервисы читают `.env` (env_file: ./.env). Убедитесь, что файл находится в DEPLOY_PATH на
+  сервере и заполнен корректно.
+
+3) CI (локальные значения для прогонов тестов в Actions):
+
+- В workflow уже задана переменная SECRET_KEY=test-secret-key и DEBUG='True' для job `lint_and_tests`. Это безопасно для
+  CI, но в продакшне используйте настоящий SECRET_KEY.
+
+---
+
+## Использование скрипта deploy/create_yc_vm.sh
+
+В репозитории добавлен скрипт deploy/create_yc_vm.sh — он упрощает создание VM в Yandex Cloud и подготовку SSH‑ключа для
+деплоя.
+
+Пример использования:
 
 ```
-    pytest --cov=materials --cov-report=html
+# создать VM и зарезервировать IP (опционально)
+./deploy/create_yc_vm.sh --name skillshare-backend --zone ru-central1-a --reserve-ip
 ```
 
-После выполнения этой команды будет создана директория `htmlcov/` в корне проекта. Откройте файл `htmlcov/index.html` в
-вашем браузере, чтобы просмотреть подробный отчет о покрытии.
-
-### 7. Технологии
-
-Проект разработан с использованием следующих основных технологий:
-
-* **Backend**: Django, Django REST Framework
-* **База данных**: PostgreSQL
-* **Аутентификация**: JWT (JSON Web Tokens)
-* **Платежи**: Stripe
-* **Документация API**: DRF Spectacular
-* **Контейнеризация**: Docker
-
-# Заключение
-
-Этот проект предоставляет надежную основу для создания платформы онлайн-обучения, с акцентом на простоту развертывания с использованием Docker. Он демонстрирует лучшие практики
-разработки на Django REST Framework, включая структурирование кода, использование сериализаторов, ViewSet'ов, фильтрации, кастомных команд
-и интеграцию сторонних сервисов, таких как Stripe и Celery.
+Скрипт сохраняет приватный ключ в deploy/yc_deploy_key — не коммитьте его, а вставьте содержимое как GitHub Secret
+`SSH_PRIVATE_KEY`.
