@@ -12,20 +12,9 @@ load_dotenv(dotenv_path=BASE_DIR / ".env", override=False)
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# ALLOWED_HOSTS: поддерживаем либо "a,b,c" либо JSON-список '["a","b"]'
-import json
-
+# ALLOWED_HOSTS: поддерживаем либо "a,b,c" либо JSON-список '['a','b']'
 _allowed_hosts_raw = os.environ.get("ALLOWED_HOSTS") or ""
-if _allowed_hosts_raw:
-    try:
-        if _allowed_hosts_raw.strip().startswith("["):
-            ALLOWED_HOSTS = json.loads(_allowed_hosts_raw)
-        else:
-            ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_raw.split(",") if h.strip()]
-    except Exception:
-        ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_raw.split(",") if h.strip()]
-else:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+
 
 # Если SECRET_KEY не указан, разрешите безопасный откат при запуске в CI/тестах
 # (GitHub Actions устанавливает GITHUB_ACTIONS=true). Для производственных запусков без отладки требуется SECRET_KEY.

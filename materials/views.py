@@ -12,7 +12,8 @@ from materials.models import Course, CourseSubscription, Lesson
 from materials.paginators import MaterialsPagination
 from materials.serializers import CourseSerializer, LessonSerializer
 from materials.tasks import send_course_update_notification
-from users.permissions import IsNotModerator, IsOwnerOrModerator, IsOwnerOrSuperuser
+from users.permissions import (IsNotModerator, IsOwnerOrModerator,
+                               IsOwnerOrSuperuser)
 
 
 class CourseViewSet(viewsets.ModelViewSet):
