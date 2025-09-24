@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import timedelta
 from pathlib import Path
 
@@ -10,23 +11,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(dotenv_path=BASE_DIR / ".env", override=False)
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
 # ALLOWED_HOSTS: поддерживаем либо "a,b,c" либо JSON-список '['a','b']'
 _allowed_hosts_raw = os.environ.get("ALLOWED_HOSTS") or ""
-
-
-# Если SECRET_KEY не указан, разрешите безопасный откат при запуске в CI/тестах
-# (GitHub Actions устанавливает GITHUB_ACTIONS=true). Для производственных запусков без отладки требуется SECRET_KEY.
-if not SECRET_KEY:
-    gha = os.getenv("GITHUB_ACTIONS", "").lower()
-    ci_env = os.getenv("CI", "").lower()
-    pytest_cur = os.getenv("PYTEST_CURRENT_TEST")
-    if gha == "true" or ci_env == "true" or pytest_cur:
-        # Используем несекретный фиксированный ключ только в средах CI / тестирования
-        SECRET_KEY = "test-secret-key"
-    elif not DEBUG:
-        raise RuntimeError("SECRET_KEY must be set in environment for non-debug mode")
+if _allowed_hosts_raw:
+    try:
+        raw = _allowed_hosts_raw.strip()
+        if raw.startswith("["):
+            ALLOWED_HOSTS = json.loads(raw)
+        else:
+            ALLOWED_HOSTS = [h.strip() for h in raw.split(",") if h.strip()]
+    except Exception:
+        # На случай некорректного формата — падать не нужно, оставляем пустой список
+        ALLOWED_HOSTS = []
+else:
+    # В режиме отладки удобно разрешить все хосты, но в проде лучше явно задать ALLOWED_HOSTS в .env
+    ALLOWED_HOSTS = ["*"] if DEBUG else []
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -111,8 +115,6 @@ STATIC_ROOT = os.environ.get("STATIC_ROOT", "/vol/static")
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
