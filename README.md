@@ -8,8 +8,7 @@ Badges: Django, DRF, Python, PostgreSQL, Docker
 
 ## Что в репозитории
 
-Это бэкенд на Django + Django REST Framework для учебной платформы (курсы, уроки, платежи, пользователи). Основные папки
-и файлы:
+Это бэкенд на Django + Django REST Framework для учебной платформы (курсы, уроки, платежи, пользователи). Основные папки и файлы:
 
 - `skillshare_platform/` — настройки Django, URL, wsgi/asgi, celery.
 - `users/` — приложение пользователей и платежей.
@@ -85,7 +84,10 @@ REDIS_PORT=6379
 5. Простейший способ запустить локально — через Docker Compose (рекомендуется):
 
 ```bash
-docker-compose up -d --build
+# локальный (development) compose в файле docker-compose.yaml
+docker compose up -d --build
+# либо старый синтаксис (если вы используете docker-compose отдельный бинарник)
+# docker-compose up -d --build
 ```
 
 После запуска сайт будет доступен по: http://localhost:8001/ (порт проброшен на 8001 в `docker-compose.yaml`).
@@ -95,31 +97,58 @@ docker-compose up -d --build
 
 ```bash
 # выполнить миграции
-docker-compose exec backend python manage.py migrate --noinput
+docker compose exec backend python manage.py migrate --noinput
 # загрузить тестовые данные (фикстура)
-docker-compose exec backend python manage.py load_initial_data
+docker compose exec backend python manage.py load_initial_data
 # создать суперпользователя
-docker-compose exec backend python manage.py createsuperuser
+docker compose exec backend python manage.py createsuperuser
 ```
 
 7. Остановка:
 
 ```bash
-docker-compose down -v
+docker compose down -v
+# или
+# docker-compose down -v
 ```
 
 ---
  
 ## Что вводить, чтобы зайти на удалённый сервер/демку (инструкции для преподавателя)
-## Для ученика и учителя:
 
-1) Публичный URL
+### Для ученика и учителя:
 
-- Пример публичного адреса: `http://158.160.22.96:8001` — это внешний IP + порт, по которому доступно приложение.
-  
-- Swagger (API): `http://158.160.22.96:8001/api/schema/swagger-ui/`
+1) Публичный URL (production)
 
-2) SSH-доступ — правильный рабочий поток (безопасно)
+- Публичный адрес сервера (пример): `http://158.160.22.96/` — это внешний IP хоста, на котором проброшены порты 80/443 для продакшн docker compose.
+
+- Swagger (API): `http://158.160.22.96/api/schema/swagger-ui/`
+
+- Админка Django (если есть суперпользователь): `http://158.160.22.96/admin/`
+
+Примечание: в продакшне приложение поднимается из файла docker-compose.prod.yml и пробрасывает порты 80 и 443 на хост — поэтому порт в URL не указывается.
+
+2) Как запускать продакшн на сервере
+
+- Для продакшн используйте явный prod-файл:
+
+```bash
+cd /path/to/project
+# поднять весь prod-стек
+docker compose -f docker-compose.prod.yml up -d --build
+# или только nginx (если нужно)
+# docker compose -f docker-compose.prod.yml up -d --build nginx
+```
+
+- Проверки/диагностика:
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs nginx --tail=200
+docker compose -f docker-compose.prod.yml exec nginx nginx -t
+```
+
+3) SSH-доступ — правильный рабочий поток (безопасно)
 
 - Для доступа по SSH преподаватель должен иметь приватный ключ, который соответствует публичному ключу, находящемуся в
   файле `/home/test_machina/.ssh/authorized_keys` на VM. Никогда не пересылайте приватный ключ по почте.
@@ -127,7 +156,7 @@ docker-compose down -v
 - Попросите преподавателя сгенерировать у себя ключ и прислать вам только публичную часть (~/.ssh/id_ed25519.pub или
   ~/.ssh/id_rsa.pub).
 
-- Команды, которые вы выполняете на сервере (под sudo, если требуется), чтобы добавить публичный ключ:
+- Команды, чтобы добавить публичный ключ (на сервере):
 
 ```bash
 sudo mkdir -p /home/test_machina/.ssh
@@ -138,7 +167,7 @@ sudo chmod 700 /home/test_machina/.ssh
 sudo chmod 600 /home/test_machina/.ssh/authorized_keys
 ```
 
-- После этого преподаватель сможет подключиться с своей машины:
+- Преподаватель сможет подключиться со своей машины:
 
 ```bash
 ssh -i /path/to/their_private_key test_machina@158.160.22.96
@@ -147,50 +176,49 @@ ssh test_machina@158.160.22.96
 # (если приватный ключ в ~/.ssh/id_ed25519 и ssh-agent настроен)
 ```
 
-- Важно: после проверки не забудьте удаляем ключ преподавателя из `authorized_keys`, если доступ должен быть временным. Пример удаления строки:
+- Важно: после проверки не забудьте удалить ключ преподавателя из `authorized_keys`, если доступ должен быть временным. Пример удаления строки:
 
 ```bash
 sudo sed -i '\|ssh-ed25519 AAAA... teacher@example.com|d' /home/test_machina/.ssh/authorized_keys
 ```
 
-3) Быстрый альтернативный вариант (если вы не даёте SSH)
+4) Быстрый альтернативный вариант (если вы не даёте SSH)
 
 - Вы можете создать временного суперпользователя Django и отправить логин/пароль преподавателю. Пример команды (на сервере):
 
 ```bash
 # интерактивно
-docker compose exec backend python manage.py createsuperuser
+docker compose -f docker-compose.prod.yml exec backend python manage.py createsuperuser
 
 # или без интерактива (пример):
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('teacher','teacher@example.com','S3cureP@ss')" | docker compose exec -T backend python manage.py shell
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('teacher','teacher@example.com','S3cureP@ss')" | docker compose -f docker-compose.prod.yml exec -T backend python manage.py shell
 ```
 
-- После этого преподаватель сможет зайти в админку: `http://158.160.22.96:8001/admin/`.
+- После этого преподаватель сможет зайти в админку: `http://158.160.22.96/admin/`.
 
-4) Если преподаватель хочет запускать docker-compose/команды
+5) Если преподаватель хочет запускать docker-compose/команды
 
 - Дайте SSH-доступ (см. пункт 2). После входа в систему можно выполнять команды:
 
 ```bash
-docker compose ps
-docker compose logs -f backend
-docker compose exec backend bash
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f backend
+docker compose -f docker-compose.prod.yml exec backend bash
 # например, выполнить миграции
-docker compose exec backend python manage.py migrate --noinput
+docker compose -f docker-compose.prod.yml exec backend python manage.py migrate --noinput
 ```
 
-5) Что проверить в Django перед доступом по публичному IP
+6) Что проверить в Django перед доступом по публичному IP
 
 - ALLOWED_HOSTS: если DEBUG=False, в `.env` должно быть `ALLOWED_HOSTS=158.160.22.96` (порт в ALLOWED_HOSTS не указывается).
 - DEBUG: для публичного доступа желательно `DEBUG=False`.
 - SECRET_KEY: в продакшне должен быть безопасный ключ и он не должен быть в репозитории.
 
-6) Безопасность, на что обратить внимание перед раздачей доступа
+7) Безопасность, на что обратить внимание перед раздачей доступа
 
 - Не отправляйте приватные ключи.
-- Закройте/ограничьте доступ к Postgres (порт 5432) — сейчас в `docker-compose` у вас может быть проброс на 0.0.0.0:5432;
-  лучше не публиковать этот порт наружу или ограничить доступ по IP / firewall.
-- Redis в вашем примере проброшен на 127.0.0.1:6379 — это нормально (локально).
+- Закройте/ограничьте доступ к Postgres (порт 5432) — лучше не публиковать этот порт наружу или ограничить доступ по IP / firewall.
+- Redis в вашем примере проброшен на 127.0.0.1:6379 — это нормально для локального использования.
 - После ревью удалите публичный ключ преподавателя из `authorized_keys`, если доступ временный.
 
 ---
@@ -255,6 +283,7 @@ Jobs:
 
 Публичный IP: 158.160.22.96
 
-- [ ] Открыть публичный URL: `http://158.160.22.96:8001` и проверить, что приложение работает.
-- [ ] Открыть Swagger: `http://158.160.22.96:8001/api/schema/swagger-ui/`.
+- [ ] Открыть публичный URL: `http://158.160.22.96/` и проверить, что приложение работает.
+- [ ] Открыть Swagger: `http://158.160.22.96/api/schema/swagger-ui/`.
+- [] Админка:  `http://158.160.22.96/admin/`.
 - [ ] При необходимости подключиться по SSH (попросить у автора публичный ключ для доступа или прислать свой публичный ключ).
