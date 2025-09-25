@@ -25,12 +25,13 @@ COPY requirements.txt /app/
 RUN pip install --upgrade pip setuptools wheel \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy project files
 COPY . /app/
 
 # Ensure correct permissions for volumes
 RUN chown -R app:app /app
 
+# Switch to non-root user
 USER app
 
 # Expose the port that the app will run on

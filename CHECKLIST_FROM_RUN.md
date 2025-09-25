@@ -33,5 +33,3 @@ PR для проверки кода: https://github.com/MVP2024/skillshare-platf
   docker compose -f docker-compose.prod.yml logs -f backend
 
 - Вариант 2: отсутствует .env или неверные настройки — проверьте на сервере наличие .env и корректные значения (SECRET_KEY, DB, REDIS и т.д.).
-
-SSH / доступы
