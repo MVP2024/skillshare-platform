@@ -1,0 +1,185 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch: { }
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint_and_tests:
+    name: Lint and Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: skillshare_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_NAME: skillshare_test
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      SECRET_KEY: test-secret-key
+      DEBUG: 'True'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run linters and format checks
+        run: |
+          flake8
+          isort --check-only --profile black . || true
+          black --check . || true
+
+      - name: Run tests
+        run: |
+          pytest --maxfail=1 --disable-warnings -q
+
+
+  build_images:
+    name: Build Docker images (check)
+    runs-on: ubuntu-latest
+    needs: lint_and_tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image (check)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          platforms: linux/amd64
+
+  deploy:
+    name: Deploy to remote server
+    runs-on: ubuntu-latest
+    needs:
+      - lint_and_tests
+      - build_images
+    # deploy only on push to main (production)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SSH_HOST || secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME || secrets.SERVER_USER }}
+          port: ${{ secrets.SSH_PORT || secrets.SERVER_PORT || '22' }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            export GITHUB_REF_NAME="${{ github.ref_name }}"
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            echo "Deploying branch $GITHUB_REF_NAME to $DEPLOY_PATH"
+
+            if [ -z "$DEPLOY_PATH" ]; then
+              echo "DEPLOY_PATH is not set. Please configure DEPLOY_PATH secret." >&2
+              exit 1
+            fi
+
+            # Prepare directory and clone if missing
+            if [ ! -d "$DEPLOY_PATH" ]; then
+              mkdir -p "$DEPLOY_PATH"
+              git clone https://github.com/${{ github.repository }} "$DEPLOY_PATH"
+            fi
+
+            cd "$DEPLOY_PATH"
+            git fetch --all --tags
+            # checkout the branch pushed
+            git checkout "$GITHUB_REF_NAME" || git checkout -B "$GITHUB_REF_NAME" origin/"$GITHUB_REF_NAME"
+            git reset --hard origin/"$GITHUB_REF_NAME"
+
+            if [ ! -f .env ]; then
+              echo ".env not found in $DEPLOY_PATH. Please create it from .env.example and add production values." >&2
+              exit 1
+            fi
+
+            # Use Docker Compose v2 (docker compose)
+            docker compose -f docker-compose.prod.yml pull || true
+            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+
+            # Wait for backend to be running (simple check)
+            for i in $(seq 1 12); do
+              if docker compose -f docker-compose.prod.yml ps --services --filter "status=running" | grep -q backend; then
+                echo "Backend container running"
+                break
+              fi
+              echo "Waiting for backend to start... ($i)"
+              sleep 5
+            done
+
+            # Run migrations and collectstatic if backend container exists
+            if docker compose -f docker-compose.prod.yml ps --services | grep -q backend; then
+              docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput || true
+              docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || true
+            fi
+
+            docker image prune -f || true

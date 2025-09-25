@@ -1,6 +1,7 @@
 from datetime import timedelta
-from django.utils import timezone
+
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -77,14 +78,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_object()  # Получаем текущий объект до обновления
         super().perform_update(
-            serializer)  # Сохраняем обновленные данные. updated_at обновится автоматически благодаря auto_now=True
+            serializer
+        )  # Сохраняем обновленные данные. updated_at обновится автоматически благодаря auto_now=True
 
         # Проверяем, прошло ли достаточно времени с последнего уведомления.
         # Если updated_at None (впервые обновляется курс) или прошло более 4 часов
-        if (
-                instance.updated_at is None
-                or (timezone.now() - instance.updated_at) >= timedelta(hours=4)
-        ):
+        if instance.updated_at is None or (
+            timezone.now() - instance.updated_at
+        ) >= timedelta(hours=4):
             # Запускаем асинхронную задачу для отправки уведомлений
             send_course_update_notification.delay(instance.id)
             # Поскольку updated_at имеет auto_now=True, оно уже обновилось при super().perform_update(serializer).
@@ -94,7 +95,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Создание курса",
         description="Позволяет авторизованным пользователям (не модераторам) создавать новые курсы.",
-        tags=["Courses"]
+        tags=["Courses"],
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -102,7 +103,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Получение списка курсов",
         description="Получает список курсов. Пользователи видят только свои курсы, модераторы и администраторы — все курсы.",
-        tags=["Courses"]
+        tags=["Courses"],
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -110,7 +111,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Получение деталей курса",
         description="Получает подробную информацию о конкретном курсе. Доступно владельцам, модераторам и администраторам.",
-        tags=["Courses"]
+        tags=["Courses"],
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
@@ -118,7 +119,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Обновление курса",
         description="Позволяет владельцу или модератору обновить информацию о курсе.",
-        tags=["Courses"]
+        tags=["Courses"],
     )
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
@@ -126,7 +127,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Частичное обновление курса",
         description="Позволяет владельцу или модератору частично обновить информацию о курсе.",
-        tags=["Courses"]
+        tags=["Courses"],
     )
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
@@ -134,7 +135,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Удаление курса",
         description="Позволяет владельцу или администратору удалить курс. Модераторам удаление запрещено.",
-        tags=["Courses"]
+        tags=["Courses"],
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
@@ -144,13 +145,13 @@ class CourseViewSet(viewsets.ModelViewSet):
     methods=["GET"],
     summary="Получение списка уроков",
     description="Получает список уроков. Пользователи видят только свои уроки, модераторы и администраторы — все уроки.",
-    tags=["Lessons"]
+    tags=["Lessons"],
 )
 @extend_schema(
     methods=["POST"],
     summary="Создание урока",
     description="Позволяет авторизованным пользователям (не модераторам) создавать новые уроки.",
-    tags=["Lessons"]
+    tags=["Lessons"],
 )
 class LessonListCreateAPIView(generics.ListCreateAPIView):
     """
@@ -201,19 +202,19 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
     methods=["GET"],
     summary="Получение деталей урока",
     description="Получает подробную информацию о конкретном уроке. Доступно владельцам, модераторам и администраторам.",
-    tags=["Lessons"]
+    tags=["Lessons"],
 )
 @extend_schema(
     methods=["PUT", "PATCH"],
     summary="Обновление урока",
     description="Позволяет владельцу или модератору обновить информацию о уроке.",
-    tags=["Lessons"]
+    tags=["Lessons"],
 )
 @extend_schema(
     methods=["DELETE"],
     summary="Удаление урока",
     description="Позволяет владельцу или администратору удалить урок. Модераторам удаление запрещено.",
-    tags=["Lessons"]
+    tags=["Lessons"],
 )
 class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -272,10 +273,9 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
         # Проверяем, прошло ли достаточно времени с последнего уведомления для КУРСА.
         # Если updated_at None (впервые обновляется курс) или прошло более 4 часов
-        if (
-                course_of_lesson.updated_at is None
-                or (timezone.now() - course_of_lesson.updated_at) >= timedelta(hours=4)
-        ):
+        if course_of_lesson.updated_at is None or (
+            timezone.now() - course_of_lesson.updated_at
+        ) >= timedelta(hours=4):
             # Запускаем асинхронную задачу для отправки уведомлений по КУРСУ
             send_course_update_notification.delay(course_of_lesson.id)
 
@@ -283,6 +283,7 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
             # Поскольку updated_at в модели Course имеет auto_now=True, достаточно просто сохранить объект Course,
             # чтобы это поле обновилось до текущего времени.
             course_of_lesson.save()
+
 
 class CourseSubscriptionView(APIView):
     """
@@ -294,34 +295,40 @@ class CourseSubscriptionView(APIView):
     Возвращает:
     - message - статус операции (добавлена/удалена)
     """
+
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
         summary="Подписка/отписка на курс",
         description="Позволяет пользователю подписаться на курс или отписаться, если ужн подписан. Требует `course_id` в теле запроса.",
-        request={"application/json": {"course_id": {"type": "integer", "description": "ID курса"}}},
+        request={
+            "application/json": {
+                "course_id": {"type": "integer", "description": "ID курса"}
+            }
+        },
         responses={
             200: {"description": "Успешная операция подписки/отписки"},
             400: {"description": "Неверный запрос (например, отсутствует course_id)"},
             401: {"description": "Неавторизованный доступ"},
-            404: {"description": "Курс не найден"}
+            404: {"description": "Курс не найден"},
         },
-        tags=["Courses"]
+        tags=["Courses"],
     )
-
     def post(self, request, *args, **kwargs):
         user = request.user
-        course_id = request.data.get('course_id')
+        course_id = request.data.get("course_id")
 
         if not course_id:
-            return Response({"error": "Параметр 'course_id' обязателен."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Параметр 'course_id' обязателен."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         course = get_object_or_404(Course, pk=course_id)
 
         # Проверяем, существует ли подписка, и создаем/удаляем ее
         subscription, created = CourseSubscription.objects.get_or_create(
-            user=user,
-            course=course
+            user=user, course=course
         )
 
         if not created:

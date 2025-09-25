@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum
-from django.utils import timezone
 
 
 class Course(models.Model):
@@ -50,7 +49,7 @@ class Course(models.Model):
         null=True,
         blank=True,
         verbose_name="Дата последнего обновления курса",
-        help_text="Время последнего обновления курса. Используется для контроля частоты уведомлений."
+        help_text="Время последнего обновления курса. Используется для контроля частоты уведомлений.",
     )
 
     @property
@@ -59,7 +58,7 @@ class Course(models.Model):
         Возвращает общую стоимость курса, суммируя цены всех связанных уроков.
         """
         # 'lessons' - это related_name из ForeignKey в модели Lesson
-        return self.lessons.aggregate(total_amount=Sum('price'))['total_amount'] or 0.00
+        return self.lessons.aggregate(total_amount=Sum("price"))["total_amount"] or 0.00
 
     @property
     def actual_price(self):
@@ -76,7 +75,7 @@ class Course(models.Model):
     class Meta:
         verbose_name = "Курс"
         verbose_name_plural = "Курсы"
-        ordering = ['id']
+        ordering = ["id"]
 
     def __str__(self):
         return self.title
@@ -133,7 +132,7 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
-        ordering = ['id']
+        ordering = ["id"]
 
     def __str__(self):
         return f"{self.title} ({self.course.title})"
@@ -141,32 +140,33 @@ class Lesson(models.Model):
 
 class CourseSubscription(models.Model):
     """
-        Модель подписки пользователя на обновления курса.
+    Модель подписки пользователя на обновления курса.
 
-        Поля:
-        - user: Пользователь, который подписывается
-        - course: Курс, на который оформляется подписка
-        - created: Дата создания подписки
-        """
+    Поля:
+    - user: Пользователь, который подписывается
+    - course: Курс, на который оформляется подписка
+    - created: Дата создания подписки
+    """
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='subscriptions',
-        verbose_name='Пользователь'
+        related_name="subscriptions",
+        verbose_name="Пользователь",
     )
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name='subscribers',
-        verbose_name='Курс'
+        related_name="subscribers",
+        verbose_name="Курс",
     )
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         # Уникальность пары пользователь-курс, чтобы один пользователь не мог подписаться на один курс дважды
-        unique_together = ('user', 'course')
-        verbose_name = 'Подписка на курс'
-        verbose_name_plural = 'Подписки на курсы'
+        unique_together = ("user", "course")
+        verbose_name = "Подписка на курс"
+        verbose_name_plural = "Подписки на курсы"
 
     def __str__(self):
         return f"{self.user} - {self.course}"

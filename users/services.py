@@ -1,10 +1,11 @@
 import os
+
 import stripe
 from django.conf import settings
-from django.db.models import Sum
-from users.models import Payment
-from materials.models import Course, Lesson
 from django.shortcuts import get_object_or_404
+
+from materials.models import Course, Lesson
+from users.models import Payment
 
 # Устанавливаем секретный ключ Stripe из переменных окружения
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -12,15 +13,15 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 def create_stripe_product(name: str):
     """
-        Создаёт продукт в Stripe
-            Аргументы:
-                name (str):Название продукта.
-                    Если продукт с таким именем уже существует, используется существующий.
-                    В противном случае создается новый продукт.
-            Возвращает:
-                stripe.Product: Объект продукта Stripe.
-            Исключения:
-                stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe API.
+    Создаёт продукт в Stripe
+        Аргументы:
+            name (str):Название продукта.
+                Если продукт с таким именем уже существует, используется существующий.
+                В противном случае создается новый продукт.
+        Возвращает:
+            stripe.Product: Объект продукта Stripe.
+        Исключения:
+            stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe API.
     """
     try:
         # Попытаться найти существующий продукт по имени
@@ -28,7 +29,9 @@ def create_stripe_product(name: str):
         # в некоторых версиях API или конфигурациях.
         # Для больших объемов данных рекомендуется хранить Stripe ID продукта в вашей базе.
 
-        all_products = stripe.Product.list(active=True, limit=100)  # Увеличьте limit, если у вас много продуктов
+        all_products = stripe.Product.list(
+            active=True, limit=100
+        )  # Увеличьте limit, если у вас много продуктов
         for product in all_products.data:
             if product.name == name:
                 print(f"Продукт '{name}' уже существует, используем его.")
@@ -47,19 +50,19 @@ def create_stripe_product(name: str):
 
 def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
     """
-        Создает или находит цену для продукта в Stripe.
-        Цены в Stripe неизменяемы, поэтому при изменении суммы для существующего product_id
-        или lookup_key, необходимо создать новую цену.
-            Аргументы:
-                amount (int): Сумма в минимальных единицах валюты (например, в копейках для рублей).
-                Сумма должна быть уже умножена на 100 перед передачей.
-                stripe_product_id (str): ID продукта Stripe, к которому привязывается цена.
-                lookup_key (str): Уникальный ключ для быстрого поиска цены.
-                                Рекомендуется включать в него ID продукта и сумму для уникальности.
-            Возвращает:
-                stripe.Price: Объект цены Stripe.
-            Исключения:
-                stripe.error.StripeError: Если произошла ошибка при создании/получении цены.
+    Создает или находит цену для продукта в Stripe.
+    Цены в Stripe неизменяемы, поэтому при изменении суммы для существующего product_id
+    или lookup_key, необходимо создать новую цену.
+        Аргументы:
+            amount (int): Сумма в минимальных единицах валюты (например, в копейках для рублей).
+            Сумма должна быть уже умножена на 100 перед передачей.
+            stripe_product_id (str): ID продукта Stripe, к которому привязывается цена.
+            ветветlookup_key (str): Уникальный ключ для быстрого поиска цены.
+                            Рекомендуется включать в него ID продукта и сумму для уникальности.
+        Возвращает:
+            stripe.Price: Объект цены Stripe.
+        Исключения:
+            stripe.error.StripeError: Если произошла ошибка при создании/получении цены.
     """
     try:
         # Попытаться найти существующую цену по lookup_key и product_id
@@ -69,11 +72,12 @@ def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
             product=stripe_product_id,
             unit_amount=amount,  # Добавлено для точного соответствия суммы
             currency="rub",  # Добавлено для точного соответствия валюты
-            active=True  # Учитывать только активные цены
+            active=True,  # Учитывать только активные цены
         )
         if existing_prices.data:
             print(
-                f"Цена с lookup_key '{lookup_key}', суммой {amount / 100.0:.2f} и продуктом '{stripe_product_id}' уже существует, используем её.")
+                f"Цена с lookup_key '{lookup_key}', суммой {amount / 100.0:.2f} и продуктом '{stripe_product_id}' уже существует, используем её."
+            )
             return existing_prices.data[0]  # Вернуть первую найденную цену
 
         # Если цена не найдена, создать новую
@@ -92,16 +96,16 @@ def create_stripe_price(amount: int, stripe_product_id: str, lookup_key: str):
 
 def create_stripe_checkout_session(price_id: str, payment_id: int):
     """
-        Создает сессию Stripe Checkout для получения ссылки на оплату.
-            Аргументы:
-                price_id (str): ID цены Stripe (созданный ранее через create_stripe_price).
-                payment_id (int): ID платежа из вашей локальной базы данных.
-                                  Используется в метаданных для связывания сессии Stripe
-                                  с вашим платежом при обратных вызовах.
-            Возвращает:
-                stripe.checkout.Session: Объект сессии Stripe Checkout, содержащий URL для оплаты.
-            Исключения:
-                stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe API.
+    Создает сессию Stripe Checkout для получения ссылки на оплату.
+        Аргументы:
+            price_id (str): ID цены Stripe (созданный ранее через create_stripe_price).
+            payment_id (int): ID платежа из вашей локальной базы данных.
+                              Используется в метаданных для связывания сессии Stripe
+                              с вашим платежом при обратных вызовах.
+        Возвращает:
+            stripe.checkout.Session: Объект сессии Stripe Checkout, содержащий URL для оплаты.
+        Исключения:
+            stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe API.
     """
     try:
         checkout_session = stripe.checkout.Session.create(
@@ -112,7 +116,8 @@ def create_stripe_checkout_session(price_id: str, payment_id: int):
                 },
             ],
             mode="payment",
-            success_url=settings.BASE_URL + "/success?session_id={CHECKOUT_SESSION_ID}",  # URL для успешной оплаты
+            success_url=settings.BASE_URL
+            + "/success?session_id={CHECKOUT_SESSION_ID}",  # URL для успешной оплаты
             cancel_url=settings.BASE_URL + "/cancel",  # URL для отмены оплаты
             metadata={"payment_id": payment_id},  # Сохраняем ID нашего платежа
         )
@@ -124,16 +129,16 @@ def create_stripe_checkout_session(price_id: str, payment_id: int):
 
 def retrieve_stripe_session(session_id: str):
     """
-        Получает информацию о сессии Stripe по ее ID.
-        Используется для проверки статуса платежа после перенаправления
-        или при обработке веб-перехватчиками.
-            Аргументы:
-                session_id (str): ID сессии Stripe.
-            Возвращает:
-                stripe.checkout.Session: Объект сессии Stripe Checkout.
-            Исключения:
-                stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe API
-                                  (например, сессия не найдена или неверный ID).
+    Получает информацию о сессии Stripe по ее ID.
+    Используется для проверки статуса платежа после перенаправления
+    или при обработке веб-перехватчиками.
+        Аргументы:
+            session_id (str): ID сессии Stripe.
+        Возвращает:
+            stripe.checkout.Session: Объект сессии Stripe Checkout.
+        Исключения:
+            stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe API
+                              (например, сессия не найдена или неверный ID).
     """
     try:
         session = stripe.checkout.Session.retrieve(session_id)
@@ -145,20 +150,20 @@ def retrieve_stripe_session(session_id: str):
 
 def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_id):
     """
-        Обрабатывает запрос на оплату, создает запись Payment в локальной системе
-        и генерирует сессию Stripe для платных материалов.
-        Если материал бесплатный или уже оплачен, возвращает соответствующее сообщение
-        без создания новой сессии Stripe.
-            Аргументы:
-                user (User): Пользователь, совершающий оплату.
-                paid_course_id (int): ID курса для оплаты (может быть None).
-                paid_lesson_id (int): ID урока для оплаты (может быть None).
-            Возвращает:
-                dict: Словарь с информацией о платеже и ссылкой на оплату (payment_id, payment_url, amount, status, message).
-            Исключения:
-                ValueError: Если не указан ни курс, ни урок, или оба.
-                Http404: Если курс или урок не найден.
-                stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe.
+    Обрабатывает запрос на оплату, создает запись Payment в локальной системе
+    и генерирует сессию Stripe для платных материалов.
+    Если материал бесплатный или уже оплачен, возвращает соответствующее сообщение
+    без создания новой сессии Stripe.
+        Аргументы:
+            user (User): Пользователь, совершающий оплату.
+            paid_course_id (int): ID курса для оплаты (может быть None).
+            paid_lesson_id (int): ID урока для оплаты (может быть None).
+        Возвращает:
+            dict: Словарь с информацией о платеже и ссылкой на оплату (payment_id, payment_url, amount, status, message).
+        Исключения:
+            ValueError: Если не указан ни курс, ни урок, или оба.
+            Http404: Если курс или урок не найден.
+            stripe.error.StripeError: Если произошла ошибка при взаимодействии со Stripe.
     """
     if paid_course_id and paid_lesson_id:
         raise ValueError("Платеж не может быть одновременно за курс и за урок.")
@@ -257,7 +262,9 @@ def process_payment_and_create_stripe_session(user, paid_course_id, paid_lesson_
         stripe_product = create_stripe_product(item_title)
 
         # Создаем или получаем цену в Stripe (сумма в копейках)
-        stripe_price = create_stripe_price(int(amount_to_pay * 100), stripe_product.id, price_lookup_key)
+        stripe_price = create_stripe_price(
+            int(amount_to_pay * 100), stripe_product.id, price_lookup_key
+        )
 
         # Создаем сессию оплаты Stripe
         checkout_session = create_stripe_checkout_session(stripe_price.id, payment.id)
